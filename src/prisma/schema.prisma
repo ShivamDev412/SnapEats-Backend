@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                       Int       @id @default(autoincrement())
+  name                     String
+  email                    String    @unique
+  emailVerified            Boolean   @default(false) // Email verification
+  emailOtp                 String? // OTP for email verification
+  emailOtpExpiry           DateTime? // OTP expiry time for email verification
+  password                 String
+  profilePicture           String?
+  compressedProfilePicture String?
+  phoneNumber              String?
+  phoneNumberVerified      Boolean   @default(false) // Phone number verification
+  phoneOtp                 String? // OTP for phone number verification
+  phoneOtpExpiry           DateTime? // OTP expiry time for phone number verification
+  refreshTokens            String[]  @default([])
+  addresses                Address[] // One to Many relation
+  orders                   Order[] // One to Many relation
+  cart                     Cart? // One to One relation
+  storeId                  Int?      @unique
+  Store                    Store? // One to One relation
+  googleId                 String?   @unique // For Social Login
+  facebookId               String?   @unique // For Social Login
+  stripeCustomerId         String?   @unique // Stripe Customer ID
+  reviews                  Review[] // One to Many relation
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  passwordResetToken       String? // Token for password reset
+  passwordResetTokenExpiry DateTime? // Token expiry date
+}
+
+model Address {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  type      String
+  street    String
+  city      String
+  state     String
+  zipCode   String
+  country   String
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Store {
+  id              Int           @id @default(autoincrement())
+  name            String
+  phoneNumber     String
+  email           String
+  image           String?
+  compressedImage String?
+  user            User          @relation(fields: [userId], references: [id])
+  userId          Int           @unique
+  address         StoreAddress? // One to One relation
+  orders          Order[] // One to Many relation
+  menuItems       MenuItem[] // One to Many relation
+  reviews         Review[] // One to Many relation
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model StoreAddress {
+  id        Int      @id @default(autoincrement())
+  store     Store    @relation(fields: [storeId], references: [id])
+  storeId   Int      @unique
+  street    String
+  city      String
+  state     String
+  zipCode   String
+  country   String
+  latitude  Float
+  longitude Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Predifined categories for menu items
+model Category {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  menuItems MenuItem[] // One to Many relation
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+// Predefined options for customizing menu items
+model Option {
+  id              Int              @id @default(autoincrement())
+  name            String // e.g., Size, Toppings
+  choices         Choice[] // One to Many relation
+  menuItemsOption MenuItemOption[] // One to Many relation
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Choice {
+  id              Int              @id @default(autoincrement())
+  option          Option           @relation(fields: [optionId], references: [id])
+  optionId        Int
+  name            String // e.g., Small, Medium, Large
+  additionalPrice Float?
+  menuItemChoices MenuItemChoice[] // One to Many relation
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model MenuItem {
+  id              Int              @id @default(autoincrement())
+  store           Store            @relation(fields: [storeId], references: [id])
+  storeId         Int
+  category        Category         @relation(fields: [categoryId], references: [id])
+  categoryId      Int
+  name            String
+  description     String?
+  price           Float
+  image           String?
+  compressedImage String?
+  isVeg           Boolean
+  options         MenuItemOption[] // One to Many relation
+  orderItems      OrderItem[] // One to Many relation
+  reviews         Review[] // One to Many relation
+  cartItems       CartItem[] // One to Many relation
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model MenuItemOption {
+  id         Int              @id @default(autoincrement())
+  menuItem   MenuItem         @relation(fields: [menuItemId], references: [id])
+  menuItemId Int
+  option     Option           @relation(fields: [optionId], references: [id])
+  optionId   Int
+  choices    MenuItemChoice[] // One to Many relation
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+}
+
+model MenuItemChoice {
+  id               Int            @id @default(autoincrement())
+  menuItemOption   MenuItemOption @relation(fields: [menuItemOptionId], references: [id])
+  menuItemOptionId Int
+  choice           Choice         @relation(fields: [choiceId], references: [id])
+  choiceId         Int
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  store      Store    @relation(fields: [storeId], references: [id])
+  storeId    Int
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItemId Int
+  rating     Int // Rating out of 5
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Order {
+  id          Int         @id @default(autoincrement())
+  user        User        @relation(fields: [userId], references: [id])
+  userId      Int
+  store       Store       @relation(fields: [storeId], references: [id])
+  storeId     Int
+  items       OrderItem[] // One to Many relation
+  totalAmount Float
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  PREPARING
+  READY
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELED
+}
+
+model OrderItem {
+  id         Int               @id @default(autoincrement())
+  order      Order             @relation(fields: [orderId], references: [id])
+  orderId    Int
+  menuItem   MenuItem          @relation(fields: [menuItemId], references: [id])
+  menuItemId Int
+  name       String
+  quantity   Int
+  price      Float
+  options    OrderItemOption[] // One to Many relation
+  note       String? // Optional field for specific notes or instructions
+}
+
+model OrderItemOption {
+  id              Int       @id @default(autoincrement())
+  orderItem       OrderItem @relation(fields: [orderItemId], references: [id])
+  orderItemId     Int
+  name            String // e.g., Size
+  choice          String // e.g., Medium
+  additionalPrice Float? // Additional cost for the selected option
+}
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    Int        @unique
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+}
+
+model CartItem {
+  id         Int              @id @default(autoincrement())
+  cart       Cart             @relation(fields: [cartId], references: [id])
+  cartId     Int
+  menuItem   MenuItem         @relation(fields: [menuItemId], references: [id])
+  menuItemId Int
+  name       String
+  quantity   Int
+  price      Float
+  options    CartItemOption[] // One to Many relation to capture selected customizations
+  note       String? // Optional field for specific notes or instructions
+}
+
+model CartItemOption {
+  id              Int      @id @default(autoincrement())
+  cartItem        CartItem @relation(fields: [cartItemId], references: [id])
+  cartItemId      Int
+  name            String // e.g., Size
+  choice          String // e.g., Medium
+  additionalPrice Float? // Additional cost for the selected option
+}
