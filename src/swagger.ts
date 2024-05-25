@@ -12,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000/api/v1',
+        url: 'https://snapeats-backend.onrender.com/api/v1',
       },
     ],
   },
