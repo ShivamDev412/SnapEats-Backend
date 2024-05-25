@@ -12,7 +12,7 @@ import { setupSwagger } from './swagger';
 dotenv.config();
 
 const app = express();
-const PORT = parseInt(process.env.PORT!, 10);
+const port = parseInt(process.env.PORT!, 10) || 4000;
 
 app.use(express.json());
 app.use(morgan("combined"));
@@ -27,6 +27,6 @@ app.use(
 app.use(BASE_PATH, router);
 setupSwagger(app);
 app.use(errorHandler);
-app.listen(PORT, () => {
-  console.log(MESSAGES.SERVER_RUNNING(PORT));
+app.listen(port, () => {
+  console.log(MESSAGES.SERVER_RUNNING(port));
 });
