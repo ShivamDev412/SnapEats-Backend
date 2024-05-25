@@ -84,3 +84,5 @@ To set up the project locally, follow these steps:
 - `npx prisma studio`: Open Prisma Studio to view and edit the database.
 
 ## API Documentation
+
+- `https://snapeats-backend.onrender.com/api-docs`
