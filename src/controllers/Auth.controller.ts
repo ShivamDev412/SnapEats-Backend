@@ -20,7 +20,7 @@ type AuthServiceType = {
     file: Express.Multer.File
   ) => Promise<{ token: string; refreshToken: string }>;
 };
-
+// 
 class AuthController {
   authService: AuthServiceType;
   constructor() {
