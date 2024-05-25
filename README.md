@@ -12,9 +12,6 @@ This is the backend service for the SnapEats food delivery application. It is bu
   - [Environment Variables](#environment-variables)
   - [Scripts](#scripts)
   - [API Documentation](#api-documentation)
-  - [Error Handling](#error-handling)
-  - [Contributing](#contributing)
-  - [License](#license)
 
 ## Features
 
@@ -86,3 +83,4 @@ To set up the project locally, follow these steps:
 ## API Documentation
 
 - `https://snapeats-backend.onrender.com/api-docs`
+
