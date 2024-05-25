@@ -8,6 +8,7 @@ import router from "./routers";
 import { BASE_PATH } from "./utils/Endpoints";
 import { MESSAGES } from "./utils/Constant";
 import errorHandler from "./middlewares/Error.middleware";
+import { setupSwagger } from './swagger';
 dotenv.config();
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(
   })
 );
 app.use(BASE_PATH, router);
+setupSwagger(app);
 app.use(errorHandler);
 app.listen(PORT, () => {
   console.log(MESSAGES.SERVER_RUNNING(PORT));
