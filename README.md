@@ -11,7 +11,7 @@ This is the backend service for the SnapEats food delivery application. It is bu
   - [Setup](#setup)
   - [Environment Variables](#environment-variables)
   - [Scripts](#scripts)
-  - [API Endpoints](#api-endpoints)
+  - [API Documentation](#api-documentation)
   - [Error Handling](#error-handling)
   - [Contributing](#contributing)
   - [License](#license)
