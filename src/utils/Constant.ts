@@ -1,5 +1,5 @@
 export const MESSAGES = {
-  SERVER_RUNNING: (port: number) => `Server is running on port ${port}`,
+  SERVER_RUNNING: (port: number | string) => `Server is running on port ${port}`,
   LOGIN_SUCCESS: "Login successful",
   SIGNUP_SUCCESS: "Signup successful",
   USER_NOT_FOUND: "User with this email does not exist",
