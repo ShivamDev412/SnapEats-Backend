@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id                       Int       @id @default(autoincrement())
+  id                       String    @id @default(cuid())
   name                     String
   email                    String    @unique
   emailVerified            Boolean   @default(false) // Email verification
@@ -38,9 +38,9 @@ model User {
 }
 
 model Address {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   user      User     @relation(fields: [userId], references: [id])
-  userId    Int
+  userId    String
   type      String
   street    String
   city      String
@@ -54,14 +54,14 @@ model Address {
 }
 
 model Store {
-  id              Int           @id @default(autoincrement())
+  id              String        @id @default(cuid())
   name            String
   phoneNumber     String
   email           String
   image           String?
   compressedImage String?
   user            User          @relation(fields: [userId], references: [id])
-  userId          Int           @unique
+  userId          String        @unique
   address         StoreAddress? // One to One relation
   orders          Order[] // One to Many relation
   menuItems       MenuItem[] // One to Many relation
@@ -71,9 +71,9 @@ model Store {
 }
 
 model StoreAddress {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   store     Store    @relation(fields: [storeId], references: [id])
-  storeId   Int      @unique
+  storeId   String   @unique
   street    String
   city      String
   state     String
@@ -87,7 +87,7 @@ model StoreAddress {
 
 // Predifined categories for menu items
 model Category {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(cuid())
   name      String     @unique
   menuItems MenuItem[] // One to Many relation
   createdAt DateTime   @default(now())
@@ -96,18 +96,18 @@ model Category {
 
 // Predefined options for customizing menu items
 model Option {
-  id              Int              @id @default(autoincrement())
+  id              String           @id @default(cuid())
   name            String // e.g., Size, Toppings
   choices         Choice[] // One to Many relation
   menuItemsOption MenuItemOption[] // One to Many relation
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 }
 
 model Choice {
-  id              Int              @id @default(autoincrement())
+  id              String           @id @default(cuid())
   option          Option           @relation(fields: [optionId], references: [id])
-  optionId        Int
+  optionId        String
   name            String // e.g., Small, Medium, Large
   additionalPrice Float?
   menuItemChoices MenuItemChoice[] // One to Many relation
@@ -116,11 +116,11 @@ model Choice {
 }
 
 model MenuItem {
-  id              Int              @id @default(autoincrement())
+  id              String           @id @default(cuid())
   store           Store            @relation(fields: [storeId], references: [id])
-  storeId         Int
+  storeId         String
   category        Category         @relation(fields: [categoryId], references: [id])
-  categoryId      Int
+  categoryId      String
   name            String
   description     String?
   price           Float
@@ -136,34 +136,34 @@ model MenuItem {
 }
 
 model MenuItemOption {
-  id         Int              @id @default(autoincrement())
+  id         String           @id @default(cuid())
   menuItem   MenuItem         @relation(fields: [menuItemId], references: [id])
-  menuItemId Int
+  menuItemId String
   option     Option           @relation(fields: [optionId], references: [id])
-  optionId   Int
+  optionId   String
   choices    MenuItemChoice[] // One to Many relation
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
 }
 
 model MenuItemChoice {
-  id               Int            @id @default(autoincrement())
+  id               String         @id @default(cuid())
   menuItemOption   MenuItemOption @relation(fields: [menuItemOptionId], references: [id])
-  menuItemOptionId Int
+  menuItemOptionId String
   choice           Choice         @relation(fields: [choiceId], references: [id])
-  choiceId         Int
+  choiceId         String
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 }
 
 model Review {
-  id         Int      @id @default(autoincrement())
+  id         String   @id @default(cuid())
   user       User     @relation(fields: [userId], references: [id])
-  userId     Int
+  userId     String
   store      Store    @relation(fields: [storeId], references: [id])
-  storeId    Int
+  storeId    String
   menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
-  menuItemId Int
+  menuItemId String
   rating     Int // Rating out of 5
   comment    String?
   createdAt  DateTime @default(now())
@@ -171,11 +171,11 @@ model Review {
 }
 
 model Order {
-  id          Int         @id @default(autoincrement())
+  id          String      @id @default(cuid())
   user        User        @relation(fields: [userId], references: [id])
-  userId      Int
+  userId      String
   store       Store       @relation(fields: [storeId], references: [id])
-  storeId     Int
+  storeId     String
   items       OrderItem[] // One to Many relation
   totalAmount Float
   status      OrderStatus @default(PENDING)
@@ -193,11 +193,11 @@ enum OrderStatus {
 }
 
 model OrderItem {
-  id         Int               @id @default(autoincrement())
+  id         String            @id @default(cuid())
   order      Order             @relation(fields: [orderId], references: [id])
-  orderId    Int
+  orderId    String
   menuItem   MenuItem          @relation(fields: [menuItemId], references: [id])
-  menuItemId Int
+  menuItemId String
   name       String
   quantity   Int
   price      Float
@@ -206,28 +206,28 @@ model OrderItem {
 }
 
 model OrderItemOption {
-  id              Int       @id @default(autoincrement())
+  id              String    @id @default(cuid())
   orderItem       OrderItem @relation(fields: [orderItemId], references: [id])
-  orderItemId     Int
+  orderItemId     String
   name            String // e.g., Size
   choice          String // e.g., Medium
   additionalPrice Float? // Additional cost for the selected option
 }
 
 model Cart {
-  id        Int        @id @default(autoincrement())
+  id        String     @id @default(cuid())
   user      User       @relation(fields: [userId], references: [id])
-  userId    Int        @unique
+  userId    String     @unique
   items     CartItem[]
   createdAt DateTime   @default(now())
 }
 
 model CartItem {
-  id         Int              @id @default(autoincrement())
+  id         String           @id @default(cuid())
   cart       Cart             @relation(fields: [cartId], references: [id])
-  cartId     Int
+  cartId     String
   menuItem   MenuItem         @relation(fields: [menuItemId], references: [id])
-  menuItemId Int
+  menuItemId String
   name       String
   quantity   Int
   price      Float
@@ -236,9 +236,9 @@ model CartItem {
 }
 
 model CartItemOption {
-  id              Int      @id @default(autoincrement())
+  id              String   @id @default(cuid())
   cartItem        CartItem @relation(fields: [cartItemId], references: [id])
-  cartItemId      Int
+  cartItemId      String
   name            String // e.g., Size
   choice          String // e.g., Medium
   additionalPrice Float? // Additional cost for the selected option
