@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx nodemon",
-    "build": "rimraf ./build && tsc",
-    "start": "npm run build && node build/index.js"
+    "clean": "rimraf build",
+    "build": "npm run clean && tsc && npx prisma generate",
+    "start": "node build/index.js",
+    "dev": "npx nodemon"
   },
   "keywords": [],
   "author": "",
