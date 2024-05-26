@@ -6,6 +6,9 @@ const RESOURCE_PATH = {
 const ENDPOINTS = {
   LOGIN: "/login",
   SIGNUP: "/signup",
+  BASE:"/",
+  UPDATE_PROFILE: "/update-profile",
+
 };
 
 export { ENDPOINTS, BASE_PATH, RESOURCE_PATH };

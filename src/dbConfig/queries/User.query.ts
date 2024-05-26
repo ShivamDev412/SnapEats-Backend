@@ -36,6 +36,17 @@ const getUserById = async (id: string) => {
     where: {
       id,
     },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profilePicture: true,
+      compressedProfilePicture: true,
+      storeId: true,
+      emailVerified: true,
+      phoneNumberVerified: true,
+      phoneNumber: true,
+    },
   });
 };
 const updateUser = async (id: string, data: any) => {

@@ -3,6 +3,7 @@ export const MESSAGES = {
   LOGIN_SUCCESS: "Login successful",
   SIGNUP_SUCCESS: "Signup successful",
   USER_NOT_FOUND: "User with this email does not exist",
+  USER_BY_ID_NOT_FOUND: "User with this id does not exist",
   INVALID_PASSWORD: "Invalid password",
   NOT_FOUND: "Not Found",
   VALIDATION_ERROR: "Validation Error",
@@ -10,8 +11,10 @@ export const MESSAGES = {
   INTERNAL_SERVER_ERROR: "Internal Server Error",
   UNEXPECTED_ERROR: "An unexpected error occurred",
   UNAUTHORIZED: "Unauthorized",
-  FORBIDDEN: "Forbidden",
+  FORBIDDEN: "Invalid authorization token",
   USER_ALREADY_EXISTS: "User already exists with this email",
+  INVALID_AUTH_HEADER: "Invalid authorization header",
+  IMAGE_ERROR:"Something went wrong while retrieving image",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
@@ -24,6 +27,7 @@ export const VALIDATION_MESSAGES = {
   INVALID_PASSWORD:
     "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character",
   PROFILE_PICTURE_REQUIRED: "Profile picture is required",
+
 };
 export const STATUS_CODE = {
   OK: 200,

@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import AuthService from "../services/Auth.service";
@@ -7,22 +6,10 @@ import { updateUser } from "../dbConfig/queries/User.query";
 import { MESSAGES, STATUS_CODE, VALIDATION_MESSAGES } from "../utils/Constant";
 import { LoginSchema, SignupSchema } from "../Schemas/UserAuth.schema";
 import { NotFoundError } from "../utils/Error";
-type AuthServiceType = {
-  loginUser: (
-    email: string,
-    password: string
-  ) => Promise<{ token: string; refreshToken: string; user: User }>;
-  signupUser: (
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string,
-    file: Express.Multer.File
-  ) => Promise<{ token: string; refreshToken: string }>;
-};
+
 //
 class AuthController {
-  authService: AuthServiceType;
+  authService: AuthService;
   constructor() {
     this.authService = new AuthService();
   }

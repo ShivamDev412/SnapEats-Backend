@@ -34,5 +34,14 @@ class AuthError extends AppError {
     super(message, STATUS_CODE.UNAUTHORIZED);
   }
 }
-
-export { AppError, NotFoundError, ValidationError, AuthError };
+class ForbiddenError extends AppError {
+  constructor(message = MESSAGES.FORBIDDEN) {
+    super(message, STATUS_CODE.FORBIDDEN);
+  }
+}
+class InternalServerError extends AppError {
+  constructor(message = MESSAGES.INTERNAL_SERVER_ERROR) {
+    super(message, STATUS_CODE.INTERNAL_SERVER_ERROR);
+  }
+}
+export { AppError, NotFoundError, ValidationError, AuthError, ForbiddenError, InternalServerError };
