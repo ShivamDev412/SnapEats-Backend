@@ -15,6 +15,7 @@ export const MESSAGES = {
   USER_ALREADY_EXISTS: "User already exists with this email",
   INVALID_AUTH_HEADER: "Invalid authorization header",
   IMAGE_ERROR:"Something went wrong while retrieving image",
+  USER_PROFILE_UPDATED: "User profile updated successfully",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",

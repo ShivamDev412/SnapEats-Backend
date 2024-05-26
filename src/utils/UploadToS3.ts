@@ -2,6 +2,7 @@ import {
     S3Client,
     GetObjectCommand,
     PutObjectCommand,
+    DeleteObjectCommand,
   } from "@aws-sdk/client-s3";
   import crypto from "crypto";
   import dotenv from "dotenv";
@@ -120,7 +121,19 @@ import {
       throw error;
     }
   };
-  
+  export const deleteImageFromS3 = async (name: string) => {
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME!,
+      Key: name,
+    };
+    try {
+      await s3.send(new DeleteObjectCommand(params));
+      console.log(`Image ${name} deleted from S3`);
+    } catch (error) {
+      console.error('Error deleting image from S3:', error);
+      throw error;
+    }
+  }
   
   
   
