@@ -13,6 +13,8 @@ class UserController {
    *   get:
    *     summary: Get user information
    *     tags: [User]
+   *     security:
+   *       - bearerAuth: []
    *     responses:
    *       200:
    *         description: User information retrieved successfully
