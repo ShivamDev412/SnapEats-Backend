@@ -4,10 +4,17 @@ const RESOURCE_PATH = {
   USER: "/user",
 };
 const ENDPOINTS = {
+  // Auth
   LOGIN: "/login",
   SIGNUP: "/signup",
+  LOGOUT: "/logout",
+  REFRESH_TOKEN: "/refresh-token",
+  // User
   BASE:"/",
   UPDATE_PROFILE: "/update-profile",
+  FORGOT_PASSWORD: "/forgot-password",
+  RESET_PASSWORD: "/reset-password",
+
 
 };
 

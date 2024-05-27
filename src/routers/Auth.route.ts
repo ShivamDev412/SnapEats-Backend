@@ -8,5 +8,6 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage }).single("image");
 routes.post(ENDPOINTS.LOGIN, authController.login);
 routes.post(ENDPOINTS.SIGNUP, upload, authController.signup);
+routes.get(ENDPOINTS.REFRESH_TOKEN, authController.refreshToken);
 
 export default routes;

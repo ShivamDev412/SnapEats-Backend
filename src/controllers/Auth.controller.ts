@@ -5,7 +5,7 @@ import { clearCookie, setCookies } from "../utils/HandleCookies";
 import { updateUser } from "../dbConfig/queries/User.query";
 import { MESSAGES, STATUS_CODE, VALIDATION_MESSAGES } from "../utils/Constant";
 import { LoginSchema, SignupSchema } from "../Schemas/UserAuth.schema";
-import { NotFoundError } from "../utils/Error";
+import { InternalServerError, NotFoundError } from "../utils/Error";
 
 //
 class AuthController {
@@ -184,15 +184,48 @@ class AuthController {
         refreshTokens: [...newRefreshTokenArray, refreshToken],
       });
       setCookies(res, "snapEats-refresh-token", refreshToken);
-      res
-        .status(STATUS_CODE.OK)
-        .json({ message: MESSAGES.LOGIN_SUCCESS, "auth-token": token });
+      res.status(STATUS_CODE.OK).json({
+        message: MESSAGES.LOGIN_SUCCESS,
+        success: true,
+        "auth-token": token,
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res
           .status(STATUS_CODE.BAD_REQUEST)
           .json({ message: error.errors });
       }
+      next(error);
+    }
+  };
+  refreshToken = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const cookies = request.cookies;
+      const refreshToken = cookies["community-refresh-token"];
+      if (!refreshToken) {
+        response.status(401).json({
+          success: false,
+          message: "Refresh token not provided",
+        });
+        return;
+      }
+      const { accessTokenToSend, refreshTokenToSend } =
+        await this.authService.refreshToken(refreshToken);
+      if (accessTokenToSend && refreshTokenToSend) {
+        setCookies(response, "snapEats-refresh-token", refreshTokenToSend);
+        response.status(200).json({
+          success: true,
+          message: "Access token generated successfully",
+          "auth-token": accessTokenToSend,
+        });
+      } else {
+        throw new InternalServerError(MESSAGES.UNEXPECTED_ERROR);
+      }
+    } catch (error) {
       next(error);
     }
   };

@@ -8,7 +8,7 @@ import router from "./routers";
 import { BASE_PATH } from "./utils/Endpoints";
 import { MESSAGES } from "./utils/Constant";
 import errorHandler from "./middlewares/Error.middleware";
-import { setupSwagger } from './swagger';
+import { setupSwagger } from "./swagger";
 dotenv.config();
 
 const app = express();
@@ -18,12 +18,14 @@ app.use(express.json());
 app.use(morgan("combined"));
 app.use(cookieParser());
 app.use(compression());
-app.use(
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin:
+    process.env.NODE_ENV === "production"
+      ? "https://community-4tckqcm4i-shiv412s-projects.vercel.app"
+      : "http://localhost:5173",
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(BASE_PATH, router);
 setupSwagger(app);
 app.use(errorHandler);
