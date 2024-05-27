@@ -28,27 +28,15 @@ class AuthService {
     lastName: string,
     email: string,
     password: string,
-    file: Express.Multer.File
   ) {
     const user = await getUserByEmail(email);
     if (user) throw new AuthError(MESSAGES.USER_ALREADY_EXISTS);
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-    const profilePicture = await uploadToS3(
-      firstName,
-      file?.buffer,
-      file?.mimetype
-    );
-    const compressedProfilePicture = await uploadCompressedImageToS3(
-      firstName,
-      file?.buffer,
-      file?.mimetype
-    );
+
     const newUser = await createUser(
       `${firstName} ${lastName}`,
       email,
       hashedPassword,
-      profilePicture,
-      compressedProfilePicture
     );
     const token = createAuthToken(newUser.id, newUser.email);
     const refreshToken = createRefreshToken(newUser.id);

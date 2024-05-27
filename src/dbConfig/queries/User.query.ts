@@ -4,23 +4,23 @@ const createUser = async (
   name: string,
   email: string,
   password: string,
-  profilePicture: string,
-  compressedProfilePicture: string
+  // profilePicture: string,
+  // compressedProfilePicture: string
 ) => {
   return await prisma.user.create({
     data: {
       name,
       email,
       password,
-      profilePicture,
-      compressedProfilePicture,
+      // profilePicture,
+      // compressedProfilePicture,
     },
     select: {
       id: true,
       name: true,
       email: true,
-      profilePicture: true,
-      compressedProfilePicture: true,
+      // profilePicture: true,
+      // compressedProfilePicture: true,
     },
   });
 };
