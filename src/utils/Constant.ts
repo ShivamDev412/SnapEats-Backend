@@ -16,6 +16,8 @@ export const MESSAGES = {
   INVALID_AUTH_HEADER: "Invalid authorization header",
   IMAGE_ERROR:"Something went wrong while retrieving image",
   USER_PROFILE_UPDATED: "User profile updated successfully",
+  INVALID_REFRESH_TOKEN: "Invalid refresh token",
+  NOT_USER_WITH_THIS_REFRESH_TOKEN: "No user found with this refresh token"
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",

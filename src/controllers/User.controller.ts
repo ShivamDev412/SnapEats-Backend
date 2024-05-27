@@ -64,7 +64,7 @@ class UserController {
   };
   /**
    * @swagger
-   * /user:
+   * /user/update-profile:
    *   put:
    *     summary: Update user profile
    *     tags: [User]
@@ -148,5 +148,19 @@ class UserController {
       next(error);
     }
   };
+  // forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+  //   const { email } = req.body;
+  //   try {
+  //     const user = await this.userService.forgotPassword(email);
+  //     res.status(STATUS_CODE.OK).json({
+  //       message: MESSAGES.PASSWORD_RESET_LINK_SENT,
+  //       data: user,
+  //     });
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+
+  resetPassword = async (req: Request, res: Response, next: NextFunction) => {};
 }
 export default UserController;

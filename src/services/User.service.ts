@@ -1,5 +1,5 @@
 import { InternalServerError, NotFoundError } from "../utils/Error";
-import { getUserById, updateUser } from "../dbConfig/queries/User.query";
+import { getUserByEmail, getUserById, updateUser } from "../dbConfig/queries/User.query";
 import { MESSAGES } from "../utils/Constant";
 import {
   deleteImageFromS3,
@@ -78,6 +78,12 @@ class UserService {
       profilePicture,
       compressedProfilePicture,
     };
+  }
+  async forgotPassword(email:string) {
+    const user = await getUserByEmail(email);
+    if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
+    // Send email with reset password link
+
   }
 }
 export default UserService;
