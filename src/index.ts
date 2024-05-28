@@ -27,5 +27,6 @@ app.use(BASE_PATH, router);
 setupSwagger(app);
 app.use(errorHandler);
 app.listen(port, () => {
+  console.clear();
   console.log(MESSAGES.SERVER_RUNNING(port));
 });

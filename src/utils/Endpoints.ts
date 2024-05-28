@@ -14,8 +14,6 @@ const ENDPOINTS = {
   UPDATE_PROFILE: "/update-profile",
   FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/reset-password",
-
-
 };
 
 export { ENDPOINTS, BASE_PATH, RESOURCE_PATH };

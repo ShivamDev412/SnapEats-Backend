@@ -1,5 +1,6 @@
 export const MESSAGES = {
-  SERVER_RUNNING: (port: number | string) => `Server is running on port ${port}`,
+  SERVER_RUNNING: (port: number | string) =>
+    `Server is running on port ${port}`,
   LOGIN_SUCCESS: "Login successful",
   SIGNUP_SUCCESS: "Signup successful",
   USER_NOT_FOUND: "User with this email does not exist",
@@ -14,10 +15,15 @@ export const MESSAGES = {
   FORBIDDEN: "Invalid authorization token",
   USER_ALREADY_EXISTS: "User already exists with this email",
   INVALID_AUTH_HEADER: "Invalid authorization header",
-  IMAGE_ERROR:"Something went wrong while retrieving image",
+  IMAGE_ERROR: "Something went wrong while retrieving image",
   USER_PROFILE_UPDATED: "User profile updated successfully",
   INVALID_REFRESH_TOKEN: "Invalid refresh token",
-  NOT_USER_WITH_THIS_REFRESH_TOKEN: "No user found with this refresh token"
+  NOT_USER_WITH_THIS_REFRESH_TOKEN: "No user found with this refresh token",
+  PASSWORD_RESET_LINK_SENT: "Password reset link sent successfully",
+  RESET_PASSWORD_SUBJECT: "Reset Password",
+  PASSWORD_RESET_SUCCESS: "Password reset successfully",
+  INVALID_TOKEN: "Invalid token",
+  TOKEN_EXPIRED: "Token expired",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
@@ -30,7 +36,9 @@ export const VALIDATION_MESSAGES = {
   INVALID_PASSWORD:
     "Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character",
   PROFILE_PICTURE_REQUIRED: "Profile picture is required",
-
+  CONFIRM_PASSWORD_REQUIRED: "Confirm password is required",
+  PASSWORDS_DO_NOT_MATCH: "Password and confirm password do not match",
+  TOKEN_REQUIRED: "Token is required",
 };
 export const STATUS_CODE = {
   OK: 200,
@@ -41,3 +49,4 @@ export const STATUS_CODE = {
   NOT_FOUND: 404,
   INTERNAL_SERVER_ERROR: 500,
 };
+export const SALT_ROUNDS = 10;

@@ -1,12 +1,21 @@
+import bcrypt from "bcryptjs";
 import { InternalServerError, NotFoundError } from "../utils/Error";
-import { getUserByEmail, getUserById, updateUser } from "../dbConfig/queries/User.query";
-import { MESSAGES } from "../utils/Constant";
+import {
+  getUserByEmail,
+  getUserById,
+  getUserForgotPassword,
+  updateUser,
+} from "../dbConfig/queries/User.query";
+import { MESSAGES, SALT_ROUNDS } from "../utils/Constant";
 import {
   deleteImageFromS3,
   getImage,
   uploadCompressedImageToS3,
   uploadToS3,
 } from "../utils/UploadToS3";
+import { generateToken, verifyToken } from "../utils/GenerateToken";
+import { ForgotPasswordTemplate } from "../utils/EmailTemplates";
+import { sendToMail } from "../utils/NodeMailer";
 
 class UserService {
   async getUser(userId: string) {
@@ -79,11 +88,41 @@ class UserService {
       compressedProfilePicture,
     };
   }
-  async forgotPassword(email:string) {
+  async forgotPassword(email: string) {
     const user = await getUserByEmail(email);
     if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
-    // Send email with reset password link
-
+    const token = generateToken(user.id);
+    const expiryTime = Date.now() + 600000;
+    await updateUser(user.id, {
+      passwordResetToken: token,
+      passwordResetTokenExpiry: new Date(expiryTime),
+    });
+    const htmlTemplate = ForgotPasswordTemplate(user.name, token);
+    const emailResponse = await sendToMail(
+      email,
+      MESSAGES.RESET_PASSWORD_SUBJECT,
+      htmlTemplate
+    );
+    return emailResponse;
+  }
+  async resetPassword(password: string, token: string) {
+    const userId = verifyToken(token);
+    const user = await getUserForgotPassword(userId);
+    if (!user || token !== user?.passwordResetToken)
+      throw new InternalServerError(MESSAGES.INVALID_TOKEN);
+    if (
+      user?.passwordResetTokenExpiry &&
+      user?.passwordResetTokenExpiry < new Date()
+    ) {
+      throw new InternalServerError(MESSAGES.TOKEN_EXPIRED);
+    }
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    const updatedUser = await updateUser(userId, {
+      password: hashedPassword,
+      passwordResetToken: "",
+      passwordResetTokenExpiry: null,
+    });
+    return updatedUser;
   }
 }
 export default UserService;
