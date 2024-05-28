@@ -14,5 +14,7 @@ routes.put(
   upload,
   userController.updateUserProfile
 );
+routes.post(ENDPOINTS.FORGOT_PASSWORD, userController.forgotPassword);
+routes.post(ENDPOINTS.RESET_PASSWORD, userController.resetPassword);
 
 export default routes;

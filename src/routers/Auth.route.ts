@@ -10,4 +10,5 @@ routes.post(ENDPOINTS.LOGIN, authController.login);
 routes.post(ENDPOINTS.SIGNUP, upload, authController.signup);
 routes.get(ENDPOINTS.REFRESH_TOKEN, authController.refreshToken);
 
+
 export default routes;

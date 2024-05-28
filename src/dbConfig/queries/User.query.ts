@@ -3,24 +3,24 @@ import prisma from "..";
 const createUser = async (
   name: string,
   email: string,
-  password: string,
-  profilePicture: string,
-  compressedProfilePicture: string
+  password: string
+  // profilePicture: string,
+  // compressedProfilePicture: string
 ) => {
   return await prisma.user.create({
     data: {
       name,
       email,
       password,
-      profilePicture,
-      compressedProfilePicture,
+      // profilePicture,
+      // compressedProfilePicture,
     },
     select: {
       id: true,
       name: true,
       email: true,
-      profilePicture: true,
-      compressedProfilePicture: true,
+      // profilePicture: true,
+      // compressedProfilePicture: true,
     },
   });
 };
@@ -49,6 +49,20 @@ const getUserById = async (id: string) => {
     },
   });
 };
+const getUserForgotPassword = async (id: string) => {
+  return await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      email: true,
+      passwordResetToken: true,
+      passwordResetTokenExpiry: true,
+    },
+  });
+};
+
 const updateUser = async (id: string, data: any) => {
   return await prisma.user.update({
     where: {
@@ -57,4 +71,10 @@ const updateUser = async (id: string, data: any) => {
     data,
   });
 };
-export { createUser, getUserByEmail, getUserById, updateUser };
+export {
+  createUser,
+  getUserByEmail,
+  getUserById,
+  updateUser,
+  getUserForgotPassword,
+};

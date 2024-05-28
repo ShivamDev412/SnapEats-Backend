@@ -13,97 +13,83 @@ class AuthController {
   constructor() {
     this.authService = new AuthService();
   }
-  /**
-   * @swagger
-   * components:
-   *   schemas:
-   *     User:
-   *       type: object
-   *       required:
-   *         - email
-   *         - password
-   *         - firstName
-   *         - lastName
-   *       properties:
-   *         id:
-   *           type: string
-   *           description: The auto-generated id of the user
-   *         email:
-   *           type: string
-   *           description: The user's email
-   *         firstName:
-   *           type: string
-   *           description: The user's first name
-   *         lastName:
-   *           type: string
-   *           description: The user's last name
-   *         profilePicture:
-   *           type: string
-   *           description: The URL of the user's profile picture
-   *       example:
-   *         id: d5fE_asz
-   *         email: user@example.com
-   *         firstName: John
-   *         lastName: Doe
-   *         profilePicture: http://example.com/profile.jpg
-   *
-   * tags:
-   *   name: Auth
-   *   description: The authentication managing API
-   *
-   * /auth/signup:
-   *   post:
-   *     summary: Signs up a new user
-   *     tags: [Auth]
-   *     requestBody:
-   *       content:
-   *         multipart/form-data:
-   *           schema:
-   *             type: object
-   *             required:
-   *               - email
-   *               - password
-   *               - firstName
-   *               - lastName
-   *               - profilePicture
-   *             properties:
-   *               email:
-   *                 type: string
-   *               password:
-   *                 type: string
-   *               firstName:
-   *                 type: string
-   *               lastName:
-   *                 type: string
-   *               profilePicture:
-   *                 type: string
-   *                 format: binary
-   *     responses:
-   *       201:
-   *         description: The user was successfully created
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/User'
-   *       400:
-   *         description: Bad request
-   */
-
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *         - firstName
+ *         - lastName
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The auto-generated id of the user
+ *         email:
+ *           type: string
+ *           description: The user's email
+ *         firstName:
+ *           type: string
+ *           description: The user's first name
+ *         lastName:
+ *           type: string
+ *           description: The user's last name
+ *       example:
+ *         id: d5fE_asz
+ *         email: user@example.com
+ *         firstName: John
+ *         lastName: Doe
+ *
+ * tags:
+ *   name: Auth
+ *   description: The authentication managing API
+ *
+ * /auth/signup:
+ *   post:
+ *     summary: Signs up a new user
+ *     tags: [Auth]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *               - firstName
+ *               - lastName
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: The user was successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Bad request
+ */
   signup = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { firstName, lastName, email, password } = SignupSchema.parse(
         req.body
       );
-      const file = req.file;
-      if (!file) {
-        throw new NotFoundError(VALIDATION_MESSAGES.PROFILE_PICTURE_REQUIRED);
-      }
       const { token, refreshToken } = await this.authService.signupUser(
         firstName,
         lastName,
         email,
         password,
-        file
       );
       setCookies(res, "snapEats-refresh-token", refreshToken);
       res

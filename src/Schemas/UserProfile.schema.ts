@@ -11,4 +11,18 @@ const UserProfileSchema = z.object({
     .min(1, VALIDATION_MESSAGES.LAST_NAME_REQUIRED)
     .regex(/^[a-zA-Z]+$/, VALIDATION_MESSAGES.INVALID_LAST_NAME),
 });
-export { UserProfileSchema };
+const ResetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(1, { message: VALIDATION_MESSAGES.PASSWORD_REQUIRED }),
+    confirmPassword: z
+      .string()
+      .min(1, { message: VALIDATION_MESSAGES.CONFIRM_PASSWORD_REQUIRED }),
+    token: z.string().min(1, VALIDATION_MESSAGES.TOKEN_REQUIRED),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: VALIDATION_MESSAGES.PASSWORDS_DO_NOT_MATCH,
+    path: ["confirmPassword"],
+  });
+export { UserProfileSchema, ResetPasswordSchema };
