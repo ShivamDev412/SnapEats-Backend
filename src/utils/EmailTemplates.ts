@@ -10,7 +10,7 @@ const ForgotPasswordTemplate = (name: string, token: string) => {
             We received a request to reset your password. Click the link below to reset your password.
           </p>
           <div style="text-align: center;">
-            <a href="${process.env.CORS_ORIGIN}/reset-password/${token}" style="background-color: #007bff; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
+            <a href="https://snap-eats-frontend.vercel.app/reset-password/${token}" style="background-color: #007bff; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
           </div>
           <p>This email will be valid for 10 min.</p>
           <p style="font-size: 14px; color: #666; margin-top: 20px;">
