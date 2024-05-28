@@ -19,7 +19,10 @@ const createRefreshToken = (id: string) => {
 const verifyToken = (token: string): string => {
   const { JWT_SECRET } = process.env;
   try {
-    const decode = jwt.verify(token, JWT_SECRET!) as { id: string, email?: string };
+    const decode = jwt.verify(token, JWT_SECRET!) as {
+      id: string;
+      email?: string;
+    };
     return decode.id;
   } catch (error) {
     throw new InternalServerError(MESSAGES.INVALID_TOKEN);
