@@ -21,19 +21,24 @@ class UserService {
   async getUser(userId: string) {
     const user = await getUserById(userId);
     if (!user) throw new NotFoundError(MESSAGES.USER_BY_ID_NOT_FOUND);
-
-    const profilePicture = await getImage(user?.profilePicture as string);
-    const compressedProfilePicture = await getImage(
-      user?.compressedProfilePicture as string
-    );
-    if (!profilePicture || !compressedProfilePicture) {
-      throw new InternalServerError(MESSAGES.IMAGE_ERROR);
+    let profilePicture = null;
+    let compressedProfilePicture = null;
+    if (user?.profilePicture && user?.compressedProfilePicture) {
+      profilePicture = await getImage(user?.profilePicture as string);
+      compressedProfilePicture = await getImage(
+        user?.compressedProfilePicture as string
+      );
+      if (!profilePicture || !compressedProfilePicture) {
+        throw new InternalServerError(MESSAGES.IMAGE_ERROR);
+      }
     }
-    return {
+    const dataToSend = {
       ...user,
       profilePicture,
       compressedProfilePicture,
     };
+
+    return dataToSend;
   }
   async updateUserProfile(
     userId: string,
