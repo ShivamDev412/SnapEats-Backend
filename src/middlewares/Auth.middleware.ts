@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import { MESSAGES } from "../utils/Constant";
 import { AuthError, ForbiddenError } from "../utils/Error";
 
-
 type AuthPayload = {
   id: string;
   email: string;
@@ -30,7 +29,7 @@ export const AuthMiddleware = (
   const token = authHeader?.toString().split(" ")[1];
   jwt.verify(token, process.env.JWT_SECRET!, (err, decode) => {
     if (err) {
-      return new ForbiddenError(MESSAGES.FORBIDDEN);
+      next(new ForbiddenError(MESSAGES.TOKEN_EXPIRED));
     } else {
       request.user = decode as AuthPayload;
       next();

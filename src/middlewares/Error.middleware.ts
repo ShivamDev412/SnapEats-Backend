@@ -11,7 +11,6 @@ const errorHandler = (
   next: NextFunction
 ) => {
   if (!err.isOperational) {
-    console.error("Unexpected Error:", err);
     err = new AppError(MESSAGES.UNEXPECTED_ERROR, 500);
   }
 

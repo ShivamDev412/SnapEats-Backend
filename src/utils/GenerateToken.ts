@@ -8,7 +8,7 @@ const generateToken = (id: string) => {
 };
 const createAuthToken = (id: string, email: string) => {
   const { JWT_SECRET } = process.env;
-  const token = jwt.sign({ id, email }, JWT_SECRET!, { expiresIn: "1h" });
+  const token = jwt.sign({ id, email }, JWT_SECRET!, { expiresIn: "15s" });
   return token;
 };
 const createRefreshToken = (id: string) => {

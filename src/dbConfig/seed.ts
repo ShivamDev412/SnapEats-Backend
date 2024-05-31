@@ -22,6 +22,6 @@ const removeUser = async () => {
     },
   });
 };
-// removeRefreshToken()
+removeRefreshToken()
 // removeUser();
 getUsers();

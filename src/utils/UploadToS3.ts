@@ -46,10 +46,9 @@ export const uploadToS3 = async (
   try {
     const command = new PutObjectCommand(params);
     await s3.send(command);
-    console.log("Image uploaded successfully to S3", randomImageName);
     return randomImageName;
   } catch (error) {
-    console.error("Error uploading image to S3:", error);
+
     throw error;
   }
 };
@@ -94,10 +93,6 @@ export const uploadCompressedImageToS3 = async (
     quality -= 10;
   }
 
-  console.log(
-    `Final image size: ${compressedImageBuffer.info.size} bytes with quality ${quality}`
-  );
-
   const generateRandomName = (byteLength = 32) => {
     const randomBytes = crypto.randomBytes(byteLength);
     return randomBytes.toString("hex");
@@ -116,7 +111,6 @@ export const uploadCompressedImageToS3 = async (
     await s3.send(command);
     return randomImageName;
   } catch (error) {
-    console.error("Error uploading image to S3:", error);
     throw error;
   }
 };
@@ -127,9 +121,7 @@ export const deleteImageFromS3 = async (name: string) => {
   };
   try {
     await s3.send(new DeleteObjectCommand(params));
-    console.log(`Image ${name} deleted from S3`);
   } catch (error) {
-    console.error("Error deleting image from S3:", error);
     throw error;
   }
 };
