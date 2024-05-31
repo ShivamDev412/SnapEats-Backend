@@ -11,7 +11,6 @@ import { createAuthToken, createRefreshToken } from "../utils/GenerateToken";
 import { AuthError, ForbiddenError, NotFoundError } from "../utils/Error";
 import prisma from "../dbConfig";
 
-
 class AuthService {
   async loginUser(email: string, password: string) {
     const user = await getUserByEmail(email);
@@ -26,7 +25,7 @@ class AuthService {
     firstName: string,
     lastName: string,
     email: string,
-    password: string,
+    password: string
   ) {
     const user = await getUserByEmail(email);
     if (user) throw new AuthError(MESSAGES.USER_ALREADY_EXISTS);
@@ -35,7 +34,7 @@ class AuthService {
     const newUser = await createUser(
       `${firstName} ${lastName}`,
       email,
-      hashedPassword,
+      hashedPassword
     );
     const token = createAuthToken(newUser.id, newUser.email);
     const refreshToken = createRefreshToken(newUser.id);
@@ -69,8 +68,8 @@ class AuthService {
       );
       throw new ForbiddenError(MESSAGES.NOT_USER_WITH_THIS_REFRESH_TOKEN);
     } else {
-      let accessTokenToSend:string = "";
-      let refreshTokenToSend:string = "";
+      let accessTokenToSend: string = "";
+      let refreshTokenToSend: string = "";
       const newRefreshTokenArray = existingUser?.refreshTokens.filter(
         (token: string) => {
           return token !== refreshToken;

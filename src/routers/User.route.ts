@@ -16,5 +16,10 @@ routes.put(
 );
 routes.post(ENDPOINTS.FORGOT_PASSWORD, userController.forgotPassword);
 routes.post(ENDPOINTS.RESET_PASSWORD, userController.resetPassword);
+routes.post(ENDPOINTS.LOGOUT, AuthMiddleware, userController.logOut);
+routes.get(ENDPOINTS.ADDRESS, AuthMiddleware, userController.address);
+routes.post(ENDPOINTS.ADDRESS, AuthMiddleware, userController.createAddress);
+routes.put(ENDPOINTS.ADDRESS, AuthMiddleware, userController.updateAddress);
+routes.delete(ENDPOINTS.ADDRESS, AuthMiddleware, userController.deleteAddress);
 
 export default routes;

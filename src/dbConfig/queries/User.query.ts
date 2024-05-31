@@ -49,6 +49,17 @@ const getUserById = async (id: string) => {
     },
   });
 };
+const getUserRefreshToken = async (id: string) => {
+  return await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      refreshTokens: true,
+    },
+  });
+};
+
 const getUserForgotPassword = async (id: string) => {
   return await prisma.user.findUnique({
     where: {
@@ -71,10 +82,48 @@ const updateUser = async (id: string, data: any) => {
     data,
   });
 };
+const getUserAddressById = async (id: string) => {
+  return await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      addresses: true,
+    },
+  });
+};
+const createAddress = async (id: string, data: any) => {
+  return await prisma.address.create({
+    data: {
+      ...data,
+      userId: id,
+    },
+  });
+};
+const updateAddress = async (addressId: string, data: any) => {
+  return await prisma.address.update({
+    where: {
+      id: addressId,
+    },
+    data,
+  });
+};
+const deleteAddress = async (id: string) => {
+  return await prisma.address.delete({
+    where: {
+      id,
+    },
+  });
+};
 export {
   createUser,
   getUserByEmail,
   getUserById,
   updateUser,
   getUserForgotPassword,
+  getUserRefreshToken,
+  getUserAddressById,
+  createAddress,
+  updateAddress,
+  deleteAddress,
 };

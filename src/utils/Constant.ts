@@ -24,6 +24,12 @@ export const MESSAGES = {
   PASSWORD_RESET_SUCCESS: "Password reset successfully",
   INVALID_TOKEN: "Invalid token",
   TOKEN_EXPIRED: "Token expired",
+  ACCESS_TOKEN_GENERATED: "Access token generated successfully",
+  REFRESH_TOKEN_NOT_FOUND: "Refresh Token not found",
+  LOGGED_OUT: "Logged out successfully",
+  ADDRESS_CREATED: "Address created successfully",
+  ADDRESS_UPDATED: "Address updated successfully",
+  ADDRESS_DELETED: "Address deleted successfully",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
@@ -39,6 +45,7 @@ export const VALIDATION_MESSAGES = {
   CONFIRM_PASSWORD_REQUIRED: "Confirm password is required",
   PASSWORDS_DO_NOT_MATCH: "Password and confirm password do not match",
   TOKEN_REQUIRED: "Token is required",
+  
 };
 export const STATUS_CODE = {
   OK: 200,
@@ -49,4 +56,5 @@ export const STATUS_CODE = {
   NOT_FOUND: 404,
   INTERNAL_SERVER_ERROR: 500,
 };
+export const REFRESH_COOKIE = "snapEats-refresh-token";
 export const SALT_ROUNDS = 10;

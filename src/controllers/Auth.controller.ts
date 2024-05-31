@@ -3,9 +3,13 @@ import { z } from "zod";
 import AuthService from "../services/Auth.service";
 import { clearCookie, setCookies } from "../utils/HandleCookies";
 import { updateUser } from "../dbConfig/queries/User.query";
-import { MESSAGES, STATUS_CODE, VALIDATION_MESSAGES } from "../utils/Constant";
+import {
+  MESSAGES,
+  REFRESH_COOKIE,
+  STATUS_CODE,
+} from "../utils/Constant";
 import { LoginSchema, SignupSchema } from "../Schemas/UserAuth.schema";
-import { InternalServerError, NotFoundError } from "../utils/Error";
+import { AuthError, InternalServerError, NotFoundError } from "../utils/Error";
 
 //
 class AuthController {
@@ -91,14 +95,12 @@ class AuthController {
         email,
         password
       );
-      setCookies(res, "snapEats-refresh-token", refreshToken);
-      res
-        .status(STATUS_CODE.OK)
-        .json({
-          message: MESSAGES.SIGNUP_SUCCESS,
-          "auth-token": token,
-          success: true,
-        });
+      setCookies(res, REFRESH_COOKIE, refreshToken);
+      res.status(STATUS_CODE.OK).json({
+        message: MESSAGES.SIGNUP_SUCCESS,
+        "auth-token": token,
+        success: true,
+      });
     } catch (error) {
       if (error instanceof z.ZodError) {
         return res
@@ -161,19 +163,19 @@ class AuthController {
         password
       );
       // Filter out old refresh tokens
-      const newRefreshTokenArray = cookies["snapEats-refresh-token"]
+      const newRefreshTokenArray = cookies[REFRESH_COOKIE]
         ? user.refreshTokens.filter(
-            (rt: string) => rt !== cookies["snapEats-refresh-token"]
+            (rt: string) => rt !== cookies[REFRESH_COOKIE]
           )
         : user.refreshTokens;
       // Clear the old refresh token if it exists
-      if (cookies["snapEats-refresh-token"]) {
-        clearCookie(res, "snapEats-refresh-token");
+      if (cookies[REFRESH_COOKIE]) {
+        clearCookie(res, REFRESH_COOKIE);
       }
       await updateUser(user.id, {
         refreshTokens: [...newRefreshTokenArray, refreshToken],
       });
-      setCookies(res, "snapEats-refresh-token", refreshToken);
+      setCookies(res, REFRESH_COOKIE, refreshToken);
       res.status(STATUS_CODE.OK).json({
         message: MESSAGES.LOGIN_SUCCESS,
         success: true,
@@ -195,21 +197,17 @@ class AuthController {
   ) => {
     try {
       const cookies = request.cookies;
-      const refreshToken = cookies["community-refresh-token"];
+      const refreshToken = cookies[REFRESH_COOKIE];
       if (!refreshToken) {
-        response.status(401).json({
-          success: false,
-          message: "Refresh token not provided",
-        });
-        return;
+        return new AuthError(MESSAGES.INVALID_REFRESH_TOKEN);
       }
       const { accessTokenToSend, refreshTokenToSend } =
         await this.authService.refreshToken(refreshToken);
       if (accessTokenToSend && refreshTokenToSend) {
-        setCookies(response, "snapEats-refresh-token", refreshTokenToSend);
+        setCookies(response, REFRESH_COOKIE, refreshTokenToSend);
         response.status(200).json({
           success: true,
-          message: "Access token generated successfully",
+          message: MESSAGES.ACCESS_TOKEN_GENERATED,
           "auth-token": accessTokenToSend,
         });
       } else {

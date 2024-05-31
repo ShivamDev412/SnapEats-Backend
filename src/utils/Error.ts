@@ -1,17 +1,15 @@
-// src/utils/errors.ts
-
 import { MESSAGES, STATUS_CODE } from "./Constant";
 
 class AppError extends Error {
   statusCode: number;
-  status: string;
   isOperational: boolean;
+  success: boolean;
 
   constructor(message: string, statusCode: number) {
     super(message);
     this.statusCode = statusCode;
-    this.status = `${statusCode}`.startsWith("4") ? "fail" : "error";
     this.isOperational = true;
+    this.success = false;
 
     Error.captureStackTrace(this, this.constructor);
   }
@@ -44,4 +42,11 @@ class InternalServerError extends AppError {
     super(message, STATUS_CODE.INTERNAL_SERVER_ERROR);
   }
 }
-export { AppError, NotFoundError, ValidationError, AuthError, ForbiddenError, InternalServerError };
+export {
+  AppError,
+  NotFoundError,
+  ValidationError,
+  AuthError,
+  ForbiddenError,
+  InternalServerError,
+};

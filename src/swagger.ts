@@ -12,7 +12,8 @@ const options = {
     },
     servers: [
       {
-        url: "https://snapeats-backend.onrender.com/api/v1",
+        // url: "https://snapeats-backend.onrender.com/api/v1",
+        url:"http://localhost:4000/api/v1"
       },
     ],
     components: {
