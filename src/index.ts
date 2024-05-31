@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import router from "./routers";
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(morgan("combined"));
 app.use(cookieParser());
 app.use(compression());
+app.use(helmet());
 const corsOptions = {
   origin: process.env.CORS_ORIGIN!,
   credentials: true,
