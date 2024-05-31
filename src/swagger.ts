@@ -13,8 +13,8 @@ const options = {
     servers: [
       {
         url:
-          process.env.NODE_ENV === "production"
-            ? process.env.BACKEND_URL
+          process.env.NODE_ENV! === "production"
+            ? process.env.BACKEND_URL!
             : "http://localhost:4000/api/v1",
       },
     ],

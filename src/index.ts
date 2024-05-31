@@ -19,7 +19,10 @@ app.use(morgan("combined"));
 app.use(cookieParser());
 app.use(compression());
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN!,
+  origin:
+    process.env.NODE_ENV! === "production"
+      ? process.env.CORS_ORIGIN!
+      : "http://localhost:5173",
   credentials: true,
 };
 app.use(cors(corsOptions));
