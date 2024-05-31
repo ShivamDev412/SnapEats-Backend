@@ -1,9 +1,12 @@
 import bcrypt from "bcryptjs";
 import { InternalServerError, NotFoundError } from "../utils/Error";
 import {
+  createAddress,
+  deleteAddress,
   getUserByEmail,
   getUserById,
   getUserForgotPassword,
+  updateAddress,
   updateUser,
 } from "../dbConfig/queries/User.query";
 import { MESSAGES, SALT_ROUNDS } from "../utils/Constant";
@@ -16,24 +19,30 @@ import {
 import { generateToken, verifyToken } from "../utils/GenerateToken";
 import { ForgotPasswordTemplate } from "../utils/EmailTemplates";
 import { sendToMail } from "../utils/NodeMailer";
+import { Address } from "@prisma/client";
 
 class UserService {
   async getUser(userId: string) {
     const user = await getUserById(userId);
     if (!user) throw new NotFoundError(MESSAGES.USER_BY_ID_NOT_FOUND);
-
-    const profilePicture = await getImage(user?.profilePicture as string);
-    const compressedProfilePicture = await getImage(
-      user?.compressedProfilePicture as string
-    );
-    if (!profilePicture || !compressedProfilePicture) {
-      throw new InternalServerError(MESSAGES.IMAGE_ERROR);
+    let profilePicture = null;
+    let compressedProfilePicture = null;
+    if (user?.profilePicture && user?.compressedProfilePicture) {
+      profilePicture = await getImage(user?.profilePicture as string);
+      compressedProfilePicture = await getImage(
+        user?.compressedProfilePicture as string
+      );
+      if (!profilePicture || !compressedProfilePicture) {
+        throw new InternalServerError(MESSAGES.IMAGE_ERROR);
+      }
     }
-    return {
+    const dataToSend = {
       ...user,
       profilePicture,
       compressedProfilePicture,
     };
+
+    return dataToSend;
   }
   async updateUserProfile(
     userId: string,
@@ -123,6 +132,18 @@ class UserService {
       passwordResetTokenExpiry: null,
     });
     return updatedUser;
+  }
+  async createAddress(userId: string, address: Address) {
+    const user = await getUserById(userId);
+    if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
+    const newAddress = await createAddress(userId, address);
+    return newAddress;
+  }
+  async updateAddress(userId: string, addressId:string, address: Address) {
+    const user = await getUserById(userId);
+    if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
+    const updatedAddress = await updateAddress(addressId, address);
+    return updatedAddress;
   }
 }
 export default UserService;
