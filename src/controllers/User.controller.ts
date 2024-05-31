@@ -338,7 +338,6 @@ class UserController {
     const userId = req.user?.id;
     const cookies = req.cookies;
     const refreshToken = cookies[REFRESH_COOKIE];
-    console.log(userId, refreshToken)
     if (!refreshToken) {
       return new NotFoundError(MESSAGES.REFRESH_TOKEN_NOT_FOUND);
     }

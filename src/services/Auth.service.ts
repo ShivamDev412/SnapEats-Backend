@@ -55,7 +55,7 @@ class AuthService {
     if (!existingUser) {
       jwt.verify(
         refreshToken,
-        process.env.REFRESH_TOKEN_SECRET!,
+        process.env.JWT_SECRET!,
         async (err: any, decode: any) => {
           if (err) {
             const hackedUser = await getUserById(decode?.id);
@@ -68,16 +68,16 @@ class AuthService {
       );
       throw new ForbiddenError(MESSAGES.NOT_USER_WITH_THIS_REFRESH_TOKEN);
     } else {
-      let accessTokenToSend: string = "";
-      let refreshTokenToSend: string = "";
       const newRefreshTokenArray = existingUser?.refreshTokens.filter(
         (token: string) => {
           return token !== refreshToken;
         }
       );
+      let accessTokenToSend;
+      let refreshTokenToSend;
       jwt.verify(
         refreshToken,
-        process.env.REFRESH_TOKEN_SECRET!,
+        process.env.JWT_SECRET!,
         async (err: any, decode: any) => {
           if (err) {
             await updateUser(existingUser.id, {

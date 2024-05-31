@@ -76,7 +76,7 @@ class UserService {
           file?.buffer,
           file?.mimetype
         );
-        console.log(profilePicture, compressedProfilePicture);
+    
         if (!profilePicture || !compressedProfilePicture) {
           throw new InternalServerError(MESSAGES.IMAGE_ERROR);
         }
