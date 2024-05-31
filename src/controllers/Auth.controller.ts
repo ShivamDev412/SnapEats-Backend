@@ -9,7 +9,7 @@ import {
   STATUS_CODE,
 } from "../utils/Constant";
 import { LoginSchema, SignupSchema } from "../Schemas/UserAuth.schema";
-import { AuthError, InternalServerError, NotFoundError } from "../utils/Error";
+import { AuthError, InternalServerError } from "../utils/Error";
 
 //
 class AuthController {

@@ -338,26 +338,28 @@ class UserController {
     const userId = req.user?.id;
     const cookies = req.cookies;
     const refreshToken = cookies[REFRESH_COOKIE];
-    console.log(refreshToken, userId);
-
     if (!refreshToken) {
       return new NotFoundError(MESSAGES.REFRESH_TOKEN_NOT_FOUND);
     }
-    const existingUser = await getUserRefreshToken(userId as string);
-    const deleteRefreshTokenFromDb = await updateUser(userId as string, {
-      refreshTokens: existingUser?.refreshTokens.filter((token) => {
-        return token !== refreshToken;
-      }),
-    });
-
-    if (!deleteRefreshTokenFromDb) {
-      return new InternalServerError(MESSAGES.INTERNAL_SERVER_ERROR);
-    } else {
-      clearCookie(res, REFRESH_COOKIE);
-      res.status(200).json({
-        success: true,
-        message: MESSAGES.LOGGED_OUT,
+    try {
+      const existingUser = await getUserRefreshToken(userId as string);
+      const deleteRefreshTokenFromDb = await updateUser(userId as string, {
+        refreshTokens: existingUser?.refreshTokens.filter((token) => {
+          return token !== refreshToken;
+        }),
       });
+
+      if (!deleteRefreshTokenFromDb) {
+        return new InternalServerError(MESSAGES.INTERNAL_SERVER_ERROR);
+      } else {
+        clearCookie(res, REFRESH_COOKIE);
+        res.status(200).json({
+          success: true,
+          message: MESSAGES.LOGGED_OUT,
+        });
+      }
+    } catch (error) {
+      next(error);
     }
   };
   /**
@@ -381,7 +383,6 @@ class UserController {
    *                   items:
    *                     $ref: '#/components/schemas/Address'
    */
-
   /**
    * @swagger
    * components:
@@ -417,12 +418,16 @@ class UserController {
    *           format: date-time
    */
   address = async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user?.id;
-    const address = await getUserAddressById(userId as string);
-    res.status(STATUS_CODE.OK).json({
-      success: true,
-      data: address,
-    });
+    try {
+      const userId = req.user?.id;
+      const address = await getUserAddressById(userId as string);
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: address,
+      });
+    } catch (error) {
+      next(error);
+    }
   };
   /**
    * @swagger
@@ -454,15 +459,19 @@ class UserController {
   createAddress = async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id;
     const address = req.body as Address;
-    const newAddress = await this.userService.createAddress(
-      userId as string,
-      address
-    );
-    res.status(STATUS_CODE.OK).json({
-      success: true,
-      data: newAddress,
-      message: MESSAGES.ADDRESS_CREATED,
-    });
+    try {
+      const newAddress = await this.userService.createAddress(
+        userId as string,
+        address
+      );
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: newAddress,
+        message: MESSAGES.ADDRESS_CREATED,
+      });
+    } catch (error) {
+      next(error);
+    }
   };
   /**
    * @swagger
@@ -502,50 +511,58 @@ class UserController {
     const userId = req.user?.id;
     const addressId = req.params.id;
     const address = req.body as Address;
-    const updatedAddress = await this.userService.updateAddress(
-      userId as string,
-      addressId as string,
-      address
-    );
-    res.status(STATUS_CODE.OK).json({
-      success: true,
-      data: updatedAddress,
-      message: MESSAGES.ADDRESS_UPDATED,
-    });
+    try {
+      const updatedAddress = await this.userService.updateAddress(
+        userId as string,
+        addressId as string,
+        address
+      );
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: updatedAddress,
+        message: MESSAGES.ADDRESS_UPDATED,
+      });
+    } catch (error) {
+      next(error);
+    }
   };
-/**
- * @swagger
- * /user/address/{id}:
- *   delete:
- *     summary: Delete an address
- *     tags: [Address]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: The address ID
- *     responses:
- *       200:
- *         description: Successfully deleted address
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                 message:
- *                   type: string
- */
-deleteAddress = async (req: Request, res: Response, next: NextFunction) => {
+  /**
+   * @swagger
+   * /user/address/{id}:
+   *   delete:
+   *     summary: Delete an address
+   *     tags: [Address]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: string
+   *         required: true
+   *         description: The address ID
+   *     responses:
+   *       200:
+   *         description: Successfully deleted address
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   */
+  deleteAddress = async (req: Request, res: Response, next: NextFunction) => {
     const addressId = req.params.id;
-    await deleteAddress(addressId);
-    res.status(STATUS_CODE.OK).json({
-      success: true,
-      message: MESSAGES.ADDRESS_DELETED,
-    });
+    try {
+      await deleteAddress(addressId);
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        message: MESSAGES.ADDRESS_DELETED,
+      });
+    } catch (error) {
+      next(error);
+    }
   };
 }
 export default UserController;
