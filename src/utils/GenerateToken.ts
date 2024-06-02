@@ -3,12 +3,12 @@ import { MESSAGES } from "./Constant";
 import { InternalServerError } from "./Error";
 const generateToken = (id: string) => {
   const { JWT_SECRET } = process.env;
-  const token = jwt.sign({ id }, JWT_SECRET!, { expiresIn: "1h" });
+  const token = jwt.sign({ id }, JWT_SECRET!, { expiresIn: "10m" });
   return token;
 };
 const createAuthToken = (id: string, email: string) => {
   const { JWT_SECRET } = process.env;
-  const token = jwt.sign({ id, email }, JWT_SECRET!, { expiresIn: "15s" });
+  const token = jwt.sign({ id, email }, JWT_SECRET!, { expiresIn: "30m" });
   return token;
 };
 const createRefreshToken = (id: string) => {

@@ -18,11 +18,14 @@ model User {
   profilePicture           String?
   compressedProfilePicture String?
   phoneNumber              String?
+  countryCode              String?
   phoneNumberVerified      Boolean   @default(false) // Phone number verification
   phoneOtp                 String? // OTP for phone number verification
   phoneOtpExpiry           DateTime? // OTP expiry time for phone number verification
   refreshTokens            String[]  @default([])
   addresses                Address[] // One to Many relation
+  defaultAddressId         String?   @unique // Reference to the default address
+  defaultAddress           Address?  @relation("UserDefaultAddress", fields: [defaultAddressId], references: [id])
   orders                   Order[] // One to Many relation
   cart                     Cart? // One to One relation
   storeId                  Int?      @unique
@@ -38,19 +41,18 @@ model User {
 }
 
 model Address {
-  id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  type      String
-  street    String
-  city      String
-  state     String
-  zipCode   String
-  country   String
-  latitude  Float
-  longitude Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  user               User     @relation(fields: [userId], references: [id])
+  userId             String
+  apt                String?
+  block              String?
+  address            String
+  lat                Float
+  lon                Float
+  type               String // e.g., Home, Work
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  UserDefaultAddress User?    @relation("UserDefaultAddress")
 }
 
 model Store {
@@ -74,13 +76,9 @@ model StoreAddress {
   id        String   @id @default(cuid())
   store     Store    @relation(fields: [storeId], references: [id])
   storeId   String   @unique
-  street    String
-  city      String
-  state     String
-  zipCode   String
-  country   String
-  latitude  Float
-  longitude Float
+  address   String
+  lat       Float
+  lon       Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

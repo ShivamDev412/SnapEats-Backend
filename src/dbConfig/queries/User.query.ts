@@ -1,3 +1,4 @@
+import { Address, User } from "@prisma/client";
 import prisma from "..";
 
 const createUser = async (
@@ -24,7 +25,7 @@ const createUser = async (
     },
   });
 };
-const getUserByEmail = async (email: string) => {
+const getUserByEmail = async (email: string, ) => {
   return await prisma.user.findUnique({
     where: {
       email,
@@ -46,6 +47,11 @@ const getUserById = async (id: string) => {
       emailVerified: true,
       phoneNumberVerified: true,
       phoneNumber: true,
+      defaultAddressId: true,
+      addresses: true,
+      countryCode: true,
+      googleId: true,
+
     },
   });
 };
@@ -80,25 +86,61 @@ const updateUser = async (id: string, data: any) => {
       id,
     },
     data,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      profilePicture: true,
+      compressedProfilePicture: true,
+      storeId: true,
+      emailVerified: true,
+      phoneNumberVerified: true,
+      phoneNumber: true,
+      defaultAddressId: true,
+      addresses: true,
+      countryCode: true,
+      googleId: true,
+    },
   });
 };
 const getUserAddressById = async (id: string) => {
-  return await prisma.user.findUnique({
-    where: {
-      id,
-    },
-    select: {
-      addresses: true,
-    },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        defaultAddressId: true,
+        addresses: true,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const addressesWithDefaultFlag = user.addresses.map((address) => ({
+      ...address,
+      isDefault: address.id === user.defaultAddressId,
+    }));
+
+    return addressesWithDefaultFlag;
+  } catch (err) {
+    throw err;
+  }
 };
-const createAddress = async (id: string, data: any) => {
-  return await prisma.address.create({
-    data: {
-      ...data,
-      userId: id,
-    },
-  });
+const createAddress = async (id: string, data: Address) => {
+  try {
+    const newAddress = await prisma.address.create({
+      data: {
+        ...data,
+        userId: id,
+      },
+    });
+    return newAddress;
+  } catch (err) {
+    console.log(err);
+  }
 };
 const updateAddress = async (addressId: string, data: any) => {
   return await prisma.address.update({
@@ -115,6 +157,38 @@ const deleteAddress = async (id: string) => {
     },
   });
 };
+const markAddressAsDefault = async (userId: string, addressId: string) => {
+  return await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      defaultAddressId: addressId,
+    },
+  });
+};
+const getUserPhoneOtp = async (id: string) => {
+  return await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      phoneOtp: true,
+      phoneOtpExpiry: true,
+    },
+  });
+};
+const getUserEmailOtp = async (id: string) => {
+  return await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      emailOtp: true,
+      emailOtpExpiry: true,
+    },
+  });
+};
 export {
   createUser,
   getUserByEmail,
@@ -126,4 +200,7 @@ export {
   createAddress,
   updateAddress,
   deleteAddress,
+  markAddressAsDefault,
+  getUserPhoneOtp,
+  getUserEmailOtp
 };
