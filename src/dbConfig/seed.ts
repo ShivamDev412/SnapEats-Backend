@@ -1,6 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-
+// import prisma from "./index";
 const getUsers = async () => {
   const users = await prisma.user.findMany();
   console.log(users);
@@ -22,6 +22,11 @@ const removeUser = async () => {
     },
   });
 };
-removeRefreshToken()
+const userAddress = async () => {
+   const address = await prisma.address.findMany();
+   console.log(address, "address");
+};
+// removeRefreshToken()
 // removeUser();
+userAddress();
 getUsers();

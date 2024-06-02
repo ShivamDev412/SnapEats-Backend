@@ -30,6 +30,14 @@ export const MESSAGES = {
   ADDRESS_CREATED: "Address created successfully",
   ADDRESS_UPDATED: "Address updated successfully",
   ADDRESS_DELETED: "Address deleted successfully",
+  ADDRESS_MARKED_AS_DEFAULT: "Address marked as default successfully",
+  PHONE_NUMBER_UPDATED: "Phone number updated successfully",
+  OTP_SENT: "OTP sent successfully",
+  PHONE_NUMBER_VERIFIED: "Phone number verified successfully",
+  INVALID_OTP: "Invalid OTP",
+  OTP_EXPIRED: "OTP expired",
+  OTP_RESENT: "OTP resent successfully",
+  EMAIL_VERIFIED: "Email verified successfully",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
