@@ -138,18 +138,21 @@ class UserController {
     res: Response,
     next: NextFunction
   ) => {
-    const { firstName, lastName } = UserProfileSchema.parse(req.body);
+    const { firstName, lastName, email, profilePicture } = UserProfileSchema.parse(req.body);
     const file = req.file;
     try {
       const user = await this.userService.updateUserProfile(
         req.user?.id as string,
         firstName,
         lastName,
-        file
+        email,
+        file,
+        profilePicture
       );
       res.status(STATUS_CODE.OK).json({
         message: MESSAGES.USER_PROFILE_UPDATED,
         data: user,
+        success: true,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -657,6 +660,8 @@ class UserController {
    *                 message:
    *                   type: string
    *                   example: "Phone number updated successfully"
+   *       404:
+   *         description: User Not Found
    *       500:
    *         description: Internal server error
    */
