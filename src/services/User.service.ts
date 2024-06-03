@@ -5,6 +5,7 @@ import {
   deleteAddress,
   getUserByEmail,
   getUserById,
+  getUserByPhoneNumber,
   getUserEmailOtp,
   getUserForgotPassword,
   getUserPhoneOtp,
@@ -56,54 +57,78 @@ class UserService {
     userId: string,
     firstName: string,
     lastName: string,
-    file: Express.Multer.File | undefined
+    email: string,
+    file: Express.Multer.File | undefined,
+    profilePicture?: string | undefined
   ) {
     const dataToUpdate: {
       name: string;
       profilePicture?: string;
+      email: string;
       compressedProfilePicture?: string;
+      emailVerified?: boolean;
     } = {
       name: `${firstName} ${lastName}`,
+      email,
     };
     if (file) {
       try {
         const currentUser = await getUserById(userId);
+        //* delete previous images
         if (currentUser?.profilePicture)
           await deleteImageFromS3(currentUser?.profilePicture as string);
         if (currentUser?.compressedProfilePicture)
           await deleteImageFromS3(
             currentUser?.compressedProfilePicture as string
           );
-        const profilePicture = await uploadToS3(
+        //* upload new images
+        const uploadedProfilePicture = await uploadToS3(
           firstName,
           file?.buffer,
           file?.mimetype
         );
-        const compressedProfilePicture = await uploadCompressedImageToS3(
-          firstName,
-          file?.buffer,
-          file?.mimetype
-        );
+        const uploadedCompressedProfilePicture =
+          await uploadCompressedImageToS3(
+            firstName,
+            file?.buffer,
+            file?.mimetype
+          );
 
-        if (!profilePicture || !compressedProfilePicture) {
+        if (!uploadedProfilePicture || !uploadedCompressedProfilePicture) {
           throw new InternalServerError(MESSAGES.IMAGE_ERROR);
         }
-        dataToUpdate.profilePicture = profilePicture;
-        dataToUpdate.compressedProfilePicture = compressedProfilePicture;
+        // * update user with new images
+        dataToUpdate.profilePicture = uploadedProfilePicture;
+        dataToUpdate.compressedProfilePicture =
+          uploadedCompressedProfilePicture;
+        console.log(dataToUpdate, "dataToUpdate");
+        dataToUpdate.emailVerified =
+          currentUser?.email === email && currentUser?.emailVerified;
+
+        const updatedUser = await updateUser(userId, dataToUpdate);
+
+        const profilePicture =
+          updatedUser.profilePicture &&
+          (await getImage(updatedUser.profilePicture as string));
+        const compressedProfilePicture =
+          updatedUser.compressedProfilePicture &&
+          (await getImage(updatedUser.compressedProfilePicture as string));
+
+        return {
+          ...updatedUser,
+          profilePicture,
+          compressedProfilePicture,
+        };
       } catch (error) {
         throw new InternalServerError(MESSAGES.IMAGE_ERROR);
       }
+    } else {
+      const currentUser = await getUserById(userId);
+      dataToUpdate.emailVerified =
+        currentUser?.email === email && currentUser?.emailVerified;
+      const updatedUser = await updateUser(userId, dataToUpdate);
+      return updatedUser;
     }
-    const updatedUser = await updateUser(userId, dataToUpdate);
-    const profilePicture = await getImage(updatedUser.profilePicture as string);
-    const compressedProfilePicture = await getImage(
-      updatedUser.compressedProfilePicture as string
-    );
-    return {
-      ...updatedUser,
-      profilePicture,
-      compressedProfilePicture,
-    };
   }
   async forgotPassword(email: string) {
     const user = await getUserByEmail(email);
@@ -166,6 +191,17 @@ class UserService {
   ) {
     const user = await getUserById(userId);
     if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
+    const existingUser = await getUserByPhoneNumber(phoneNumber, countryCode);
+
+    if (existingUser) {
+      throw new InternalServerError(MESSAGES.PHONE_NUMBER_ALREADY_EXISTS);
+    }
+    if (
+      user?.phoneNumber === phoneNumber &&
+      user?.countryCode === countryCode
+    ) {
+      return user;
+    }
     const updatedUser = await updateUser(userId, {
       phoneNumber,
       countryCode,
@@ -192,7 +228,7 @@ class UserService {
   }
   async verifyOTP(userId: string, otp: string) {
     const user = await getUserPhoneOtp(userId);
-    
+
     if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
     if (user?.phoneOtp !== otp)
       throw new InternalServerError(MESSAGES.INVALID_OTP);

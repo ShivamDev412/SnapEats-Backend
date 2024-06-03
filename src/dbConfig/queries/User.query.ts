@@ -32,6 +32,15 @@ const getUserByEmail = async (email: string, ) => {
     },
   });
 };
+const getUserByPhoneNumber = async (phoneNumber: string,countryCode: string) => {
+  return await prisma.user.findFirst({
+    where: {
+      phoneNumber,
+      countryCode
+    },
+  });
+
+}
 const getUserById = async (id: string) => {
   return await prisma.user.findUnique({
     where: {
@@ -202,5 +211,6 @@ export {
   deleteAddress,
   markAddressAsDefault,
   getUserPhoneOtp,
-  getUserEmailOtp
+  getUserEmailOtp,
+  getUserByPhoneNumber
 };

@@ -11,7 +11,6 @@ const ENDPOINTS = {
   REFRESH_TOKEN: "/refresh-token",
   // User
   BASE: "/",
-  UPDATE_PROFILE: "/update-profile",
   FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/reset-password",
   ADDRESS: "/address",

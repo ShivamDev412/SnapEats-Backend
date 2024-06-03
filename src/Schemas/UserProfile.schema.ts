@@ -10,6 +10,8 @@ const UserProfileSchema = z.object({
     .string()
     .min(1, VALIDATION_MESSAGES.LAST_NAME_REQUIRED)
     .regex(/^[a-zA-Z]+$/, VALIDATION_MESSAGES.INVALID_LAST_NAME),
+  email: z.string().email(VALIDATION_MESSAGES.INVALID_EMAIL),
+  profilePicture: z.string().optional(),
 });
 const ResetPasswordSchema = z
   .object({

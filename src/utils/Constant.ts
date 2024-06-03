@@ -38,6 +38,7 @@ export const MESSAGES = {
   OTP_EXPIRED: "OTP expired",
   OTP_RESENT: "OTP resent successfully",
   EMAIL_VERIFIED: "Email verified successfully",
+  PHONE_NUMBER_ALREADY_EXISTS: "This phone number is already registered with another account",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
