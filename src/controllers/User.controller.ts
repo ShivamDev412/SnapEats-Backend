@@ -76,7 +76,7 @@ class UserController {
   };
   /**
    * @swagger
-   * /user/update-profile:
+   * /user:
    *   put:
    *     summary: Update user profile
    *     tags: [User]
