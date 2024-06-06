@@ -1,50 +1,42 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import prisma from "../../dbConfig";
+import { createAuthToken, createRefreshToken } from "../../utils/GenerateToken";
+import { AuthError, ForbiddenError, NotFoundError } from "../../utils/Error";
+import { MESSAGES, SALT_ROUNDS } from "../../utils/Constant";
 import {
-  createUser,
-  getUserByEmail,
-  getUserById,
-  updateUser,
-} from "../dbConfig/queries/User.query";
-import { MESSAGES, SALT_ROUNDS } from "../utils/Constant";
-import { createAuthToken, createRefreshToken } from "../utils/GenerateToken";
-import { AuthError, ForbiddenError, NotFoundError } from "../utils/Error";
-import prisma from "../dbConfig";
+  createAdmin,
+  getAdminByEmail,
+  getAdminById,
+  updateAdmin,
+} from "../../dbConfig/queries/Admin.query";
 
 class AuthService {
+  async signupUser(email: string, password: string) {
+    const user = await getAdminByEmail(email);
+    if (user) throw new AuthError(MESSAGES.USER_ALREADY_EXISTS);
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
+    const newUser = await createAdmin(email, hashedPassword);
+    const token = createAuthToken(newUser.id, newUser.email);
+    const refreshToken = createRefreshToken(newUser.id);
+    await updateAdmin(newUser.id, {
+      refreshTokens: [refreshToken],
+    });
+    return { token, refreshToken };
+  }
   async loginUser(email: string, password: string) {
-    const user = await getUserByEmail(email);
+    const user = await getAdminByEmail(email);
     if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new AuthError(MESSAGES.INVALID_PASSWORD);
     const token = createAuthToken(user.id, user.email);
     const refreshToken = createRefreshToken(user.id);
+
     return { user, token, refreshToken };
   }
-  async signupUser(
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string
-  ) {
-    const user = await getUserByEmail(email);
-    if (user) throw new AuthError(MESSAGES.USER_ALREADY_EXISTS);
-    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-
-    const newUser = await createUser(
-      `${firstName} ${lastName}`,
-      email,
-      hashedPassword
-    );
-    const token = createAuthToken(newUser.id, newUser.email);
-    const refreshToken = createRefreshToken(newUser.id);
-    await updateUser(newUser.id, {
-      refreshTokens: [refreshToken],
-    });
-    return { token, refreshToken };
-  }
   async refreshToken(refreshToken: string) {
-    const existingUser = await prisma.user.findFirst({
+    const existingUser = await prisma.adminUser.findFirst({
       where: {
         refreshTokens: {
           hasSome: [refreshToken],
@@ -58,9 +50,9 @@ class AuthService {
         process.env.JWT_SECRET!,
         async (err: any, decode: any) => {
           if (err) {
-            const hackedUser = await getUserById(decode?.id);
-            await updateUser(hackedUser?.id as string, {
-              refresh_token: [],
+            const hackedUser = await getAdminById(decode?.id);
+            await updateAdmin(hackedUser?.id as string, {
+              refreshTokens: [],
             });
             throw new ForbiddenError(MESSAGES.INVALID_REFRESH_TOKEN);
           }
@@ -80,7 +72,7 @@ class AuthService {
         process.env.JWT_SECRET!,
         async (err: any, decode: any) => {
           if (err) {
-            await updateUser(existingUser.id, {
+            await updateAdmin(existingUser.id, {
               refreshTokens: [...newRefreshTokenArray],
             });
           }
@@ -92,7 +84,7 @@ class AuthService {
             existingUser.email
           );
           refreshTokenToSend = createRefreshToken(existingUser.id);
-          await updateUser(existingUser.id, {
+          await updateAdmin(existingUser.id, {
             refreshTokens: [...newRefreshTokenArray, refreshTokenToSend],
           });
         }

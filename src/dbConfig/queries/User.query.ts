@@ -1,4 +1,4 @@
-import { Address, User } from "@prisma/client";
+import { Address } from "@prisma/client";
 import prisma from "..";
 
 const createUser = async (

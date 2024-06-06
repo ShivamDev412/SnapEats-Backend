@@ -28,7 +28,7 @@ model User {
   defaultAddress           Address?  @relation("UserDefaultAddress", fields: [defaultAddressId], references: [id])
   orders                   Order[] // One to Many relation
   cart                     Cart? // One to One relation
-  storeId                  Int?      @unique
+  storeId                  String?   @unique
   Store                    Store? // One to One relation
   googleId                 String?   @unique // For Social Login
   facebookId               String?   @unique // For Social Login
@@ -58,6 +58,7 @@ model Address {
 model Store {
   id              String        @id @default(cuid())
   name            String
+  countryCode     String
   phoneNumber     String
   email           String
   image           String?
@@ -240,4 +241,13 @@ model CartItemOption {
   name            String // e.g., Size
   choice          String // e.g., Medium
   additionalPrice Float? // Additional cost for the selected option
+}
+
+model AdminUser {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  refreshTokens String[] @default([])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import AuthService from "../services/Auth.service";
-import { clearCookie, setCookies } from "../utils/HandleCookies";
-import { updateUser } from "../dbConfig/queries/User.query";
+import AuthService from "../../services/User/Auth.service";
+import { clearCookie, setCookies } from "../../utils/HandleCookies";
+import { updateUser } from "../../dbConfig/queries/User.query";
 import {
   MESSAGES,
   REFRESH_COOKIE,
   STATUS_CODE,
-} from "../utils/Constant";
-import { LoginSchema, SignupSchema } from "../Schemas/UserAuth.schema";
-import { AuthError, InternalServerError } from "../utils/Error";
+} from "../../utils/Constant";
+import { LoginSchema, SignupSchema } from "../../Schemas/UserAuth.schema";
+import { AuthError, InternalServerError } from "../../utils/Error";
 
 //
 class AuthController {

@@ -24,8 +24,8 @@ export const uploadToS3 = async (
 ) => {
   const compressedImage = await sharp(image)
     .resize({
-      width: 1920,
-      height: 1080,
+      // width: 1920,
+      // height: 1080,
       fit: "contain",
     })
     .toFormat("webp")
@@ -48,7 +48,6 @@ export const uploadToS3 = async (
     await s3.send(command);
     return randomImageName;
   } catch (error) {
-
     throw error;
   }
 };
