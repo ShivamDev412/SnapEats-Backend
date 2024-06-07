@@ -41,6 +41,11 @@ export const MESSAGES = {
   PHONE_NUMBER_ALREADY_EXISTS: "This phone number is already registered with another account",
   STORE_WITH_EMAIL_EXISTS: "Store with this email already exists",
   STORE_WITH_PHONE_NUMBER_EXISTS: "Store with this phone number already exists",
+  STORE_REQUEST_SEND_SUCCESS: "Store request sent successfully",
+  STORE_FETCH_SUCCESS: "Store fetched successfully",
+  STORE_REQUEST_FETCH_SUCCESS: "Store request fetched successfully",
+  STORE_REQUEST_ACCEPTED: "Store registration request accepted",
+  STORE_REQUEST_REJECTED: "Store registration request rejected",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
@@ -75,3 +80,7 @@ export const SOCKET_EVENT = {
 export const ADMIN_REFRESH_COOKIE = "snapEats-admin-refresh-token";
 export const REFRESH_COOKIE = "snapEats-refresh-token";
 export const SALT_ROUNDS = 10;
+export const EMAIL_SUBJECT = {
+  STORE_REGISTRATION_REJECTION: "Store Registration Rejected",
+  STORE_REGISTRATION_SUCCESS: "Store Registration Successful",
+}

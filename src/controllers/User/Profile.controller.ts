@@ -365,7 +365,6 @@ class ProfileController {
   verifyEmailOTP = async (req: Request, res: Response, next: NextFunction) => {
     const { otp } = req.body;
     const userId = req.user?.id;
-    console.log(otp);
     try {
       const updatedUser = await this.profileService.verifyEmailOTP(
         userId as string,

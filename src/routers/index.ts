@@ -5,11 +5,13 @@ import userAddressRoute from "./User/Address.route";
 import userProfileRoute from "./User/Profile.route";
 import adminAutRoute from "./Admin/Auth.route";
 import adminRoute from "./Admin/Admin.route";
+import storeRoute from "./Store/Store.route";
 import { RESOURCE_PATH } from "../utils/Endpoints";
 const routes = express.Router();
 
 routes.use(RESOURCE_PATH.AUTH, authRoute);
 routes.use(RESOURCE_PATH.USER, userRoute, userAddressRoute, userProfileRoute);
+routes.use(RESOURCE_PATH.STORE, storeRoute);
 routes.use(RESOURCE_PATH.ADMIN_AUTH, adminAutRoute);
 routes.use(RESOURCE_PATH.ADMIN, adminRoute);
 export default routes;

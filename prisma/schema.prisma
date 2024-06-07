@@ -69,8 +69,15 @@ model Store {
   orders          Order[] // One to Many relation
   menuItems       MenuItem[] // One to Many relation
   reviews         Review[] // One to Many relation
+  status          StoreStatus   @default(PENDING)
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+}
+
+enum StoreStatus {
+  // NOT_APPLIED
+  PENDING
+  APPROVED
 }
 
 model StoreAddress {

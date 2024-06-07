@@ -1,26 +1,27 @@
-import { InternalServerError } from "../utils/Error";
+import { InternalServerError } from "../../utils/Error";
 import {
   createStore,
   getStoreByEmail,
   getStoreByPhoneNumber,
-} from "../dbConfig/queries/Store.query";
-import { MESSAGES, SOCKET_EVENTS } from "../utils/Constant";
-import { StoreAccountRequestTemplate } from "../utils/EmailTemplates";
-import { sendToMail } from "../utils/NodeMailer";
-import { getUserById } from "../dbConfig/queries/User.query";
-import io from "../utils/SocketInstance";
+} from "../../dbConfig/queries/Store.query";
+import { MESSAGES, SOCKET_EVENT } from "../../utils/Constant";
+import { StoreAccountRequestTemplate } from "../../utils/EmailTemplates";
+import { sendToMail } from "../../utils/NodeMailer";
+import { getUserById } from "../../dbConfig/queries/User.query";
+import {io} from "../../utils/SocketInstance";
 class StoreService {
   async registerStore(
     userId: string,
     name: string,
     address: string,
     lat: number,
-    long: number,
+    lon: number,
     phoneNumber: string,
     countryCode: string,
     email: string
   ) {
     const user = await getUserById(userId);
+   
     if (!user) {
       throw new InternalServerError(MESSAGES.USER_NOT_FOUND);
     }
@@ -40,7 +41,7 @@ class StoreService {
       name,
       address,
       lat,
-      long,
+      lon,
       phoneNumber,
       countryCode,
       email
@@ -54,7 +55,7 @@ class StoreService {
         `${newStore.countryCode}${newStore.phoneNumber}`
       );
       await sendToMail(user.email, "Store Account Request", storeEmailTemplate);
-      io.emit(SOCKET_EVENTS.NEW_STORE_REQUEST, {
+      io.emit(SOCKET_EVENT.NEW_STORE_REQUEST, {
         userName: user.name,
         storeName: newStore.name,
         storeEmail: newStore.email,

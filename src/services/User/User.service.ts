@@ -88,7 +88,7 @@ class UserService {
         dataToUpdate.profilePicture = uploadedProfilePicture;
         dataToUpdate.compressedProfilePicture =
           uploadedCompressedProfilePicture;
-        console.log(dataToUpdate, "dataToUpdate");
+     
         dataToUpdate.emailVerified =
           currentUser?.email === email && currentUser?.emailVerified;
 

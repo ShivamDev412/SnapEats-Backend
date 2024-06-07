@@ -148,7 +148,7 @@ const createAddress = async (id: string, data: Address) => {
     });
     return newAddress;
   } catch (err) {
-    console.log(err);
+    
   }
 };
 const updateAddress = async (addressId: string, data: any) => {

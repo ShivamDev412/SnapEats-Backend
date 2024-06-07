@@ -20,7 +20,6 @@ class AdminController {
     const userId = req.user?.id;
     const cookies = req.cookies;
     const refreshToken = cookies[ADMIN_REFRESH_COOKIE];
-    console.log("userId", userId);
     if (!refreshToken) {
       return new NotFoundError(MESSAGES.REFRESH_TOKEN_NOT_FOUND);
     }
@@ -39,6 +38,60 @@ class AdminController {
         res.status(200).json({
           success: true,
           message: MESSAGES.LOGGED_OUT,
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
+  getStoreRequests = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const storeRequests = await this.adminService.getStoreRequests();
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: storeRequests,
+        message: MESSAGES.STORE_REQUEST_FETCH_SUCCESS,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  acceptStoreRequest = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { storeId } = req.body
+      const store = await this.adminService.acceptStoreRequest(storeId);
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: store,
+        message: MESSAGES.STORE_REQUEST_ACCEPTED,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  rejectStoreRequest = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { storeId, userId } = req.body;
+      const isStoreRemoved = await this.adminService.rejectStoreRequest(
+        storeId,
+        userId
+      );
+      if (isStoreRemoved) {
+        res.status(STATUS_CODE.OK).json({
+          success: true,
+          message: MESSAGES.STORE_REQUEST_REJECTED,
         });
       }
     } catch (error) {

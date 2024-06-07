@@ -148,7 +148,6 @@ class AddressController {
    */
   deleteAddress = async (req: Request, res: Response, next: NextFunction) => {
     const addressId = req.params.id;
-    console.log(addressId);
     try {
       await deleteAddress(addressId);
       res.status(STATUS_CODE.OK).json({
