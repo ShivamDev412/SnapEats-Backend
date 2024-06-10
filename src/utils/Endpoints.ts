@@ -27,6 +27,7 @@ const ENDPOINTS = {
   RESEND_EMAIL_OTP: "/resend-email-otp",
 
   REGISTER_STORE: "/register",
+  USER: "/user",
 
 
   // Admin

@@ -10,21 +10,28 @@ import { MESSAGES, SALT_ROUNDS } from "../../utils/Constant";
 import { createAuthToken, createRefreshToken } from "../../utils/GenerateToken";
 import { AuthError, ForbiddenError, NotFoundError } from "../../utils/Error";
 import prisma from "../../dbConfig";
+import { getStoreByUserId } from "../../dbConfig/queries/Store.query";
 
 class AuthService {
-  async loginUser(email:string, password:string) {
+  async loginUser(email: string, password: string) {
     const user = await getUserByEmail(email);
     if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
-  
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new AuthError(MESSAGES.INVALID_PASSWORD);
-  
+
     const token = user.storeId
-    ? createAuthToken(user.id, user.email, user?.storeId)
-    : createAuthToken(user.id, user.email);
+      ? createAuthToken(user.id, user.email, user?.storeId)
+      : createAuthToken(user.id, user.email);
     const refreshToken = createRefreshToken(user.id);
-  
-    return { user, token, refreshToken };
+    let isStoreRegistered = false;
+    if (user.storeId) {
+      const store = await getStoreByUserId(user.id);
+      store?.status === "APPROVED"
+        ? (isStoreRegistered = true)
+        : (isStoreRegistered = false);
+    }
+    return { user, token, refreshToken, isStoreRegistered };
   }
   async signupUser(
     firstName: string,

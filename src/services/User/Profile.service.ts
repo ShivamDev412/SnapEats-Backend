@@ -39,10 +39,12 @@ class ProfileService {
     });
     return {
       ...updatedUser,
-      profilePicture: await getImage(updatedUser.profilePicture as string),
-      compressedProfilePicture: await getImage(
-        updatedUser.compressedProfilePicture as string
-      ),
+      profilePicture: updatedUser.profilePicture
+        ? await getImage(updatedUser.profilePicture as string)
+        : null,
+      compressedProfilePicture: updatedUser.compressedProfilePicture
+        ? await getImage(updatedUser.compressedProfilePicture as string)
+        : null,
     };
   }
   async sendPhoneNumberOTP(userId: string, phoneNumber: string) {

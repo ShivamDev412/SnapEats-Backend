@@ -88,7 +88,7 @@ class UserService {
         dataToUpdate.profilePicture = uploadedProfilePicture;
         dataToUpdate.compressedProfilePicture =
           uploadedCompressedProfilePicture;
-     
+
         dataToUpdate.emailVerified =
           currentUser?.email === email && currentUser?.emailVerified;
 

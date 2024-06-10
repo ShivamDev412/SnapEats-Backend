@@ -93,6 +93,13 @@ const getPendingStores = () => {
     },
   });
 };
+const getStoreById = (id: string) => {
+  return prisma.store.findFirst({
+    where: {
+      id,
+    },
+  });
+};
 const getStoreByUserId = (id: string) => {
   return prisma.store.findFirst({
     where: {
@@ -100,11 +107,16 @@ const getStoreByUserId = (id: string) => {
     },
   });
 };
-const updateStoreById = (id: string, data: any) => {
-  return prisma.store.update({
-    where: { id },
-    data,
-  });
+const updateStoreById = async (id: string, data: any) => {
+  try {
+    const updatedStore = await prisma.store.update({
+      where: { id },
+      data,
+    });
+    return updatedStore;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
 const removeStoreById = async (userId: string, storeId: string) => {
   await prisma.user.update({
@@ -122,6 +134,18 @@ const removeStoreById = async (userId: string, storeId: string) => {
     },
   });
 };
+const getPhoneNumberOTP = (id: string) => {
+  return prisma.store.findFirst({
+    where: { id },
+    select: { phoneOtp: true, phoneOtpExpiry: true },
+  });
+};
+const getStoreEmailOtp = (id: string) => {
+  return prisma.store.findFirst({
+    where: { id },
+    select: { emailOtp: true, emailOtpExpiry: true },
+  });
+};
 export {
   createStore,
   getStoreByEmail,
@@ -130,4 +154,7 @@ export {
   getStoreByUserId,
   updateStoreById,
   removeStoreById,
+  getStoreById,
+  getPhoneNumberOTP,
+  getStoreEmailOtp,
 };

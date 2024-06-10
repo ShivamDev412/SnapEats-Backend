@@ -46,9 +46,12 @@ export const MESSAGES = {
   STORE_REQUEST_FETCH_SUCCESS: "Store request fetched successfully",
   STORE_REQUEST_ACCEPTED: "Store registration request accepted",
   STORE_REQUEST_REJECTED: "Store registration request rejected",
+  STORE_NOT_FOUND: "Store not found",
+  IMAGE_NOT_FOUND: "Image not found",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
+  STORE_NAME_REQUIRED: "Store name required",
   FIRST_NAME_REQUIRED: "First name is required",
   INVALID_FIRST_NAME: "First name should be a string",
   LAST_NAME_REQUIRED: "Last name is required",

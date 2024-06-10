@@ -2,13 +2,21 @@ import { InternalServerError } from "../../utils/Error";
 import {
   createStore,
   getStoreByEmail,
+  getStoreById,
   getStoreByPhoneNumber,
+  updateStoreById,
 } from "../../dbConfig/queries/Store.query";
 import { MESSAGES, SOCKET_EVENT } from "../../utils/Constant";
 import { StoreAccountRequestTemplate } from "../../utils/EmailTemplates";
 import { sendToMail } from "../../utils/NodeMailer";
 import { getUserById } from "../../dbConfig/queries/User.query";
-import {io} from "../../utils/SocketInstance";
+import { io } from "../../utils/SocketInstance";
+import {
+  deleteImageFromS3,
+  getImage,
+  uploadCompressedImageToS3,
+  uploadToS3,
+} from "../../utils/UploadToS3";
 class StoreService {
   async registerStore(
     userId: string,
@@ -21,7 +29,7 @@ class StoreService {
     email: string
   ) {
     const user = await getUserById(userId);
-   
+
     if (!user) {
       throw new InternalServerError(MESSAGES.USER_NOT_FOUND);
     }
@@ -63,6 +71,76 @@ class StoreService {
         storePhone: `${newStore.countryCode}${newStore.phoneNumber}`,
       });
       return newStore;
+    }
+  }
+  async updateUserProfile(
+    storeId: string,
+    name: string,
+    email: string,
+    file: Express.Multer.File | undefined,
+    image?: string | undefined
+  ) {
+    const dataToUpdate: {
+      name: string;
+      image?: string;
+      email: string;
+      compressedImage?: string;
+      emailVerified?: boolean;
+    } = {
+      name,
+      email,
+    };
+    if (file) {
+      try {
+        const currentStore = await getStoreById(storeId);
+        //* delete previous images
+        if (currentStore?.image)
+          await deleteImageFromS3(currentStore?.image as string);
+        if (currentStore?.compressedImage)
+          await deleteImageFromS3(currentStore?.compressedImage as string);
+        //* upload new images
+        const uploadedProfilePicture = await uploadToS3(
+          name,
+          file?.buffer,
+          file?.mimetype
+        );
+        const uploadedCompressedProfilePicture =
+          await uploadCompressedImageToS3(name, file?.buffer, file?.mimetype);
+        console.log(
+          uploadedProfilePicture,
+          uploadedCompressedProfilePicture,
+        );
+        if (!uploadedProfilePicture || !uploadedCompressedProfilePicture) {
+          throw new InternalServerError(MESSAGES.IMAGE_ERROR);
+        }
+        // * update user with new images
+        dataToUpdate.image = uploadedProfilePicture;
+        dataToUpdate.compressedImage = uploadedCompressedProfilePicture;
+
+        dataToUpdate.emailVerified =
+          currentStore?.email === email && currentStore?.emailVerified;
+        const updatedStore = await updateStoreById(storeId, dataToUpdate);
+
+        const image =
+          updatedStore.image && (await getImage(updatedStore.image as string));
+        const compressedImage =
+          updatedStore.compressedImage &&
+          (await getImage(updatedStore.compressedImage as string));
+
+        return {
+          ...updatedStore,
+          image,
+          compressedImage,
+        };
+      } catch (error) {
+        throw new InternalServerError(MESSAGES.IMAGE_ERROR);
+      }
+    } else {
+      const currentStore = await getStoreById(storeId);
+      dataToUpdate.emailVerified =
+        currentStore?.email === email && currentStore?.emailVerified;
+      const updatedUser = await updateStoreById(storeId, dataToUpdate);
+      return updatedUser;
     }
   }
 }

@@ -3,11 +3,7 @@ import { z } from "zod";
 import AuthService from "../../services/User/Auth.service";
 import { clearCookie, setCookies } from "../../utils/HandleCookies";
 import { updateUser } from "../../dbConfig/queries/User.query";
-import {
-  MESSAGES,
-  REFRESH_COOKIE,
-  STATUS_CODE,
-} from "../../utils/Constant";
+import { MESSAGES, REFRESH_COOKIE, STATUS_CODE } from "../../utils/Constant";
 import { LoginSchema, SignupSchema } from "../../Schemas/UserAuth.schema";
 import { AuthError, InternalServerError } from "../../utils/Error";
 
@@ -158,10 +154,8 @@ class AuthController {
       const { email, password } = LoginSchema.parse(req.body);
 
       const cookies = req.cookies;
-      const { user, token, refreshToken } = await this.authService.loginUser(
-        email,
-        password
-      );
+      const { user, token, refreshToken, isStoreRegistered } =
+        await this.authService.loginUser(email, password);
       // Filter out old refresh tokens
       const newRefreshTokenArray = cookies[REFRESH_COOKIE]
         ? user.refreshTokens.filter(
@@ -180,6 +174,7 @@ class AuthController {
         message: MESSAGES.LOGIN_SUCCESS,
         success: true,
         "auth-token": token,
+        isStoreRegistered,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
