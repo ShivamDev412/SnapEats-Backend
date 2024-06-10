@@ -48,7 +48,9 @@ class AuthService {
       email,
       hashedPassword
     );
-    const token = createAuthToken(newUser.id, newUser.email);
+    const token = newUser.storeId
+      ? createAuthToken(newUser.id, newUser.email, newUser?.storeId)
+      : createAuthToken(newUser.id, newUser.email);
     const refreshToken = createRefreshToken(newUser.id);
     await updateUser(newUser.id, {
       refreshTokens: [refreshToken],
@@ -72,7 +74,7 @@ class AuthService {
           if (err) {
             const hackedUser = await getUserById(decode?.id);
             await updateUser(hackedUser?.id as string, {
-              refresh_token: [],
+              refreshTokens: [],
             });
             throw new ForbiddenError(MESSAGES.INVALID_REFRESH_TOKEN);
           }
@@ -99,10 +101,18 @@ class AuthService {
           if (err || existingUser.id !== decode?.id) {
             throw new ForbiddenError(MESSAGES.INVALID_REFRESH_TOKEN);
           }
-          accessTokenToSend = createAuthToken(
-            existingUser.id,
-            existingUser.email
-          );
+          if (existingUser.storeId) {
+            accessTokenToSend = createAuthToken(
+              existingUser.id,
+              existingUser.email,
+              existingUser.storeId
+            );
+          } else {
+            accessTokenToSend = createAuthToken(
+              existingUser.id,
+              existingUser.email
+            );
+          }
           refreshTokenToSend = createRefreshToken(existingUser.id);
           await updateUser(existingUser.id, {
             refreshTokens: [...newRefreshTokenArray, refreshTokenToSend],

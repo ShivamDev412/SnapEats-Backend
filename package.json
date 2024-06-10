@@ -7,7 +7,8 @@
     "clean": "rimraf build",
     "build": "npm run clean && tsc && npx prisma generate",
     "start": "node build/index.js",
-    "seed": "node src/dbConfig/seed.js",
+    "category-seed": "ts-node src/dbConfig/optionsSeed.ts",
+    "seed": "ts-node src/dbConfig/seed.ts",
     "dev": "npx nodemon"
   },
   "keywords": [],

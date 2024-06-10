@@ -8,7 +8,7 @@ const storeController = new SoreController();
 const storage = multer.memoryStorage();
 const upload = multer({ storage }).single("image");
 routes.post(ENDPOINTS.REGISTER_STORE, AuthMiddleware ,storeController.registerSore);
-routes.get(ENDPOINTS.USER, AuthMiddleware, storeController.getStoreByUser);
+routes.get("/:id", AuthMiddleware, storeController.getStoreByUser);
 routes.get("/", AuthMiddleware, storeController.getStore);
 routes.put("/", upload, AuthMiddleware, storeController.updateStoreProfile);
 export default routes;

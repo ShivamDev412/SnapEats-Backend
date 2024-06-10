@@ -37,8 +37,9 @@ class SoreController {
   };
   getStoreByUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = req.user?.id;
-      const store = await getStoreByUserId(id as string);
+      const id = req.params.id;
+      console.log(id);
+      const store = await getStoreById(id as string);
       res.status(STATUS_CODE.OK).json({
         message: MESSAGES.STORE_FETCH_SUCCESS,
         success: true,

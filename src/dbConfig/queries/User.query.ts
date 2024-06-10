@@ -13,15 +13,12 @@ const createUser = async (
       name,
       email,
       password,
-      // profilePicture,
-      // compressedProfilePicture,
     },
     select: {
       id: true,
       name: true,
       email: true,
-      // profilePicture: true,
-      // compressedProfilePicture: true,
+      storeId: true,
     },
   });
 };

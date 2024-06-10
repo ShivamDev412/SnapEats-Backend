@@ -109,20 +109,18 @@ model Category {
 // Predefined options for customizing menu items
 model Option {
   id              String           @id @default(cuid())
-  name            String // e.g., Size, Toppings
-  choices         Choice[] // One to Many relation
+  name            String           // e.g., Size, Toppings
+  predefinedChoices PredefinedChoice[] // One to Many relation
   menuItemsOption MenuItemOption[] // One to Many relation
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
-
-model Choice {
+model PredefinedChoice {
   id              String           @id @default(cuid())
+  menuItemsChoice MenuItemChoice[] // One to Many relation
   option          Option           @relation(fields: [optionId], references: [id])
   optionId        String
-  name            String // e.g., Small, Medium, Large
-  additionalPrice Float?
-  menuItemChoices MenuItemChoice[] // One to Many relation
+  name            String           // e.g., Small, Medium, Large
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
@@ -135,14 +133,14 @@ model MenuItem {
   categoryId      String
   name            String
   description     String?
-  price           Float
+  price           Float            // Base price
   image           String?
   compressedImage String?
   isVeg           Boolean
   options         MenuItemOption[] // One to Many relation
-  orderItems      OrderItem[] // One to Many relation
-  reviews         Review[] // One to Many relation
-  cartItems       CartItem[] // One to Many relation
+  orderItems      OrderItem[]      // One to Many relation
+  reviews         Review[]         // One to Many relation
+  cartItems       CartItem[]       // One to Many relation
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
@@ -162,8 +160,10 @@ model MenuItemChoice {
   id               String         @id @default(cuid())
   menuItemOption   MenuItemOption @relation(fields: [menuItemOptionId], references: [id])
   menuItemOptionId String
-  choice           Choice         @relation(fields: [choiceId], references: [id])
-  choiceId         String
+  predefinedChoice PredefinedChoice? @relation(fields: [predefinedChoiceId], references: [id])
+  predefinedChoiceId String?
+  customChoice     String?
+  additionalPrice  Float          // Additional price for the choice
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 }
