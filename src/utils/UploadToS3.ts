@@ -8,6 +8,8 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import sharp from "sharp";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { NotFoundError } from "./Error";
+import { MESSAGES } from "./Constant";
 dotenv.config();
 
 const s3 = new S3Client({
@@ -24,8 +26,8 @@ export const uploadToS3 = async (
 ) => {
   const compressedImage = await sharp(image)
     .resize({
-      width: 1920,
-      height: 1080,
+      // width: 1920,
+      // height: 1080,
       fit: "contain",
     })
     .toFormat("webp")
@@ -48,11 +50,11 @@ export const uploadToS3 = async (
     await s3.send(command);
     return randomImageName;
   } catch (error) {
-
     throw error;
   }
 };
 export const getImage = async (name: string) => {
+  if (!name) return new NotFoundError(MESSAGES.IMAGE_NOT_FOUND);
   const getObjParam = {
     Bucket: process.env.S3_BUCKET_NAME!,
     Key: name,

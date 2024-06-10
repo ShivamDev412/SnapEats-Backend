@@ -39,9 +39,19 @@ export const MESSAGES = {
   OTP_RESENT: "OTP resent successfully",
   EMAIL_VERIFIED: "Email verified successfully",
   PHONE_NUMBER_ALREADY_EXISTS: "This phone number is already registered with another account",
+  STORE_WITH_EMAIL_EXISTS: "Store with this email already exists",
+  STORE_WITH_PHONE_NUMBER_EXISTS: "Store with this phone number already exists",
+  STORE_REQUEST_SEND_SUCCESS: "Store request sent successfully",
+  STORE_FETCH_SUCCESS: "Store fetched successfully",
+  STORE_REQUEST_FETCH_SUCCESS: "Store request fetched successfully",
+  STORE_REQUEST_ACCEPTED: "Store registration request accepted",
+  STORE_REQUEST_REJECTED: "Store registration request rejected",
+  STORE_NOT_FOUND: "Store not found",
+  IMAGE_NOT_FOUND: "Image not found",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
+  STORE_NAME_REQUIRED: "Store name required",
   FIRST_NAME_REQUIRED: "First name is required",
   INVALID_FIRST_NAME: "First name should be a string",
   LAST_NAME_REQUIRED: "Last name is required",
@@ -65,5 +75,15 @@ export const STATUS_CODE = {
   NOT_FOUND: 404,
   INTERNAL_SERVER_ERROR: 500,
 };
+export const SOCKET_EVENT = {
+  NEW_STORE_REQUEST: "new_store_requests",
+  DISCONNECT: "disconnect",
+  CONNECTION: "connection",
+}
+export const ADMIN_REFRESH_COOKIE = "snapEats-admin-refresh-token";
 export const REFRESH_COOKIE = "snapEats-refresh-token";
 export const SALT_ROUNDS = 10;
+export const EMAIL_SUBJECT = {
+  STORE_REGISTRATION_REJECTION: "Store Registration Rejected",
+  STORE_REGISTRATION_SUCCESS: "Store Registration Successful",
+}

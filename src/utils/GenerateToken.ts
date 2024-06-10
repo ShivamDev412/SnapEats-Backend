@@ -6,9 +6,17 @@ const generateToken = (id: string) => {
   const token = jwt.sign({ id }, JWT_SECRET!, { expiresIn: "10m" });
   return token;
 };
-const createAuthToken = (id: string, email: string) => {
+const createAuthToken = (id: string, email: string, storeId?: string) => {
   const { JWT_SECRET } = process.env;
-  const token = jwt.sign({ id, email }, JWT_SECRET!, { expiresIn: "30m" });
+  const payload = { id, email } as {
+    id: string;
+    email: string;
+    storeId?: string;
+  };
+  if (storeId) {
+    payload.storeId = storeId;
+  }
+  const token = jwt.sign(payload, JWT_SECRET!, { expiresIn: "30m" });
   return token;
 };
 const createRefreshToken = (id: string) => {
@@ -16,14 +24,15 @@ const createRefreshToken = (id: string) => {
   const token = jwt.sign({ id }, JWT_SECRET!, { expiresIn: "7d" });
   return token;
 };
-const verifyToken = (token: string): string => {
+const verifyToken = (token: string) => {
   const { JWT_SECRET } = process.env;
   try {
     const decode = jwt.verify(token, JWT_SECRET!) as {
       id: string;
       email?: string;
+      storeId?: string;
     };
-    return decode.id;
+    return decode;
   } catch (error) {
     throw new InternalServerError(MESSAGES.INVALID_TOKEN);
   }

@@ -1,7 +1,7 @@
 import express from "express";
 import multer from "multer";
-import { ENDPOINTS } from "../utils/Endpoints";
-import AuthController from "../controllers/Auth.controller";
+import { ENDPOINTS } from "../../utils/Endpoints";
+import AuthController from "../../controllers/User/Auth.controller";
 const routes = express.Router();
 const authController = new AuthController();
 const storage = multer.memoryStorage();

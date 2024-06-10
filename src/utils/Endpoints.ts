@@ -2,6 +2,9 @@ const BASE_PATH = "/api/v1";
 const RESOURCE_PATH = {
   AUTH: "/auth",
   USER: "/user",
+  STORE: "/store",
+  ADMIN_AUTH : "/admin/auth",
+  ADMIN: "/admin",
 };
 const ENDPOINTS = {
   // Auth
@@ -22,6 +25,15 @@ const ENDPOINTS = {
   SEND_EMAIL_OTP: "/send-email-otp",
   VERIFY_EMAIL_OTP: "/verify-email-otp",
   RESEND_EMAIL_OTP: "/resend-email-otp",
+
+  REGISTER_STORE: "/register",
+  USER: "/user",
+
+
+  // Admin
+  GET_STORE_REQUESTS: "/store-registration-request",
+  ACCEPT_STORE_REQUEST: "/accept-store-request",
+  REJECT_STORE_REQUEST: "/reject-store-request",
 };
 
 export { ENDPOINTS, BASE_PATH, RESOURCE_PATH };

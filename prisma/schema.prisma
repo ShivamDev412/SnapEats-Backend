@@ -28,7 +28,7 @@ model User {
   defaultAddress           Address?  @relation("UserDefaultAddress", fields: [defaultAddressId], references: [id])
   orders                   Order[] // One to Many relation
   cart                     Cart? // One to One relation
-  storeId                  Int?      @unique
+  storeId                  String?   @unique
   Store                    Store? // One to One relation
   googleId                 String?   @unique // For Social Login
   facebookId               String?   @unique // For Social Login
@@ -56,20 +56,34 @@ model Address {
 }
 
 model Store {
-  id              String        @id @default(cuid())
-  name            String
-  phoneNumber     String
-  email           String
-  image           String?
-  compressedImage String?
-  user            User          @relation(fields: [userId], references: [id])
-  userId          String        @unique
-  address         StoreAddress? // One to One relation
-  orders          Order[] // One to Many relation
-  menuItems       MenuItem[] // One to Many relation
-  reviews         Review[] // One to Many relation
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                  String        @id @default(cuid())
+  name                String
+  countryCode         String
+  phoneNumber         String
+  phoneNumberVerified Boolean       @default(false) // Phone number verification
+  phoneOtp            String? // OTP for phone number verification
+  phoneOtpExpiry      DateTime? // OTP expiry time for phone number verification
+  email               String
+  emailVerified       Boolean       @default(false) // Email verification
+  emailOtp            String? // OTP for email verification
+  emailOtpExpiry      DateTime? // OTP expiry time for email verification
+  image               String?
+  compressedImage     String?
+  user                User          @relation(fields: [userId], references: [id])
+  userId              String        @unique
+  address             StoreAddress? // One to One relation
+  orders              Order[] // One to Many relation
+  menuItems           MenuItem[] // One to Many relation
+  reviews             Review[] // One to Many relation
+  status              StoreStatus   @default(PENDING)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+}
+
+enum StoreStatus {
+  // NOT_APPLIED
+  PENDING
+  APPROVED
 }
 
 model StoreAddress {
@@ -95,20 +109,18 @@ model Category {
 // Predefined options for customizing menu items
 model Option {
   id              String           @id @default(cuid())
-  name            String // e.g., Size, Toppings
-  choices         Choice[] // One to Many relation
+  name            String           // e.g., Size, Toppings
+  predefinedChoices PredefinedChoice[] // One to Many relation
   menuItemsOption MenuItemOption[] // One to Many relation
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
-
-model Choice {
+model PredefinedChoice {
   id              String           @id @default(cuid())
+  menuItemsChoice MenuItemChoice[] // One to Many relation
   option          Option           @relation(fields: [optionId], references: [id])
   optionId        String
-  name            String // e.g., Small, Medium, Large
-  additionalPrice Float?
-  menuItemChoices MenuItemChoice[] // One to Many relation
+  name            String           // e.g., Small, Medium, Large
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
@@ -121,14 +133,14 @@ model MenuItem {
   categoryId      String
   name            String
   description     String?
-  price           Float
+  price           Float            // Base price
   image           String?
   compressedImage String?
   isVeg           Boolean
   options         MenuItemOption[] // One to Many relation
-  orderItems      OrderItem[] // One to Many relation
-  reviews         Review[] // One to Many relation
-  cartItems       CartItem[] // One to Many relation
+  orderItems      OrderItem[]      // One to Many relation
+  reviews         Review[]         // One to Many relation
+  cartItems       CartItem[]       // One to Many relation
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 }
@@ -148,8 +160,10 @@ model MenuItemChoice {
   id               String         @id @default(cuid())
   menuItemOption   MenuItemOption @relation(fields: [menuItemOptionId], references: [id])
   menuItemOptionId String
-  choice           Choice         @relation(fields: [choiceId], references: [id])
-  choiceId         String
+  predefinedChoice PredefinedChoice? @relation(fields: [predefinedChoiceId], references: [id])
+  predefinedChoiceId String?
+  customChoice     String?
+  additionalPrice  Float          // Additional price for the choice
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 }
@@ -240,4 +254,13 @@ model CartItemOption {
   name            String // e.g., Size
   choice          String // e.g., Medium
   additionalPrice Float? // Additional cost for the selected option
+}
+
+model AdminUser {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  refreshTokens String[] @default([])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

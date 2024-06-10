@@ -5,21 +5,33 @@ import {
   getUserByEmail,
   getUserById,
   updateUser,
-} from "../dbConfig/queries/User.query";
-import { MESSAGES, SALT_ROUNDS } from "../utils/Constant";
-import { createAuthToken, createRefreshToken } from "../utils/GenerateToken";
-import { AuthError, ForbiddenError, NotFoundError } from "../utils/Error";
-import prisma from "../dbConfig";
+} from "../../dbConfig/queries/User.query";
+import { MESSAGES, SALT_ROUNDS } from "../../utils/Constant";
+import { createAuthToken, createRefreshToken } from "../../utils/GenerateToken";
+import { AuthError, ForbiddenError, NotFoundError } from "../../utils/Error";
+import prisma from "../../dbConfig";
+import { getStoreByUserId } from "../../dbConfig/queries/Store.query";
 
 class AuthService {
   async loginUser(email: string, password: string) {
     const user = await getUserByEmail(email);
     if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw new AuthError(MESSAGES.INVALID_PASSWORD);
-    const token = createAuthToken(user.id, user.email);
+
+    const token = user.storeId
+      ? createAuthToken(user.id, user.email, user?.storeId)
+      : createAuthToken(user.id, user.email);
     const refreshToken = createRefreshToken(user.id);
-    return { user, token, refreshToken };
+    let isStoreRegistered = false;
+    if (user.storeId) {
+      const store = await getStoreByUserId(user.id);
+      store?.status === "APPROVED"
+        ? (isStoreRegistered = true)
+        : (isStoreRegistered = false);
+    }
+    return { user, token, refreshToken, isStoreRegistered };
   }
   async signupUser(
     firstName: string,
@@ -36,7 +48,9 @@ class AuthService {
       email,
       hashedPassword
     );
-    const token = createAuthToken(newUser.id, newUser.email);
+    const token = newUser.storeId
+      ? createAuthToken(newUser.id, newUser.email, newUser?.storeId)
+      : createAuthToken(newUser.id, newUser.email);
     const refreshToken = createRefreshToken(newUser.id);
     await updateUser(newUser.id, {
       refreshTokens: [refreshToken],
@@ -60,7 +74,7 @@ class AuthService {
           if (err) {
             const hackedUser = await getUserById(decode?.id);
             await updateUser(hackedUser?.id as string, {
-              refresh_token: [],
+              refreshTokens: [],
             });
             throw new ForbiddenError(MESSAGES.INVALID_REFRESH_TOKEN);
           }
@@ -87,10 +101,18 @@ class AuthService {
           if (err || existingUser.id !== decode?.id) {
             throw new ForbiddenError(MESSAGES.INVALID_REFRESH_TOKEN);
           }
-          accessTokenToSend = createAuthToken(
-            existingUser.id,
-            existingUser.email
-          );
+          if (existingUser.storeId) {
+            accessTokenToSend = createAuthToken(
+              existingUser.id,
+              existingUser.email,
+              existingUser.storeId
+            );
+          } else {
+            accessTokenToSend = createAuthToken(
+              existingUser.id,
+              existingUser.email
+            );
+          }
           refreshTokenToSend = createRefreshToken(existingUser.id);
           await updateUser(existingUser.id, {
             refreshTokens: [...newRefreshTokenArray, refreshTokenToSend],

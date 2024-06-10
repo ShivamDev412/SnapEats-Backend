@@ -3,9 +3,10 @@ import jwt from "jsonwebtoken";
 import { MESSAGES } from "../utils/Constant";
 import { AuthError, ForbiddenError } from "../utils/Error";
 
-type AuthPayload = {
+export type AuthPayload = {
   id: string;
   email: string;
+  storeId?: string;
 };
 declare global {
   namespace Express {
@@ -15,6 +16,7 @@ declare global {
     }
   }
 }
+
 
 export const AuthMiddleware = (
   request: Request,

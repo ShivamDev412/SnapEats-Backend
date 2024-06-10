@@ -1,4 +1,4 @@
-import { Address, User } from "@prisma/client";
+import { Address } from "@prisma/client";
 import prisma from "..";
 
 const createUser = async (
@@ -13,15 +13,12 @@ const createUser = async (
       name,
       email,
       password,
-      // profilePicture,
-      // compressedProfilePicture,
     },
     select: {
       id: true,
       name: true,
       email: true,
-      // profilePicture: true,
-      // compressedProfilePicture: true,
+      storeId: true,
     },
   });
 };
@@ -148,7 +145,7 @@ const createAddress = async (id: string, data: Address) => {
     });
     return newAddress;
   } catch (err) {
-    console.log(err);
+    
   }
 };
 const updateAddress = async (addressId: string, data: any) => {
