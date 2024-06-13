@@ -106,10 +106,6 @@ class StoreService {
         );
         const uploadedCompressedProfilePicture =
           await uploadCompressedImageToS3(name, file?.buffer, file?.mimetype);
-        console.log(
-          uploadedProfilePicture,
-          uploadedCompressedProfilePicture,
-        );
         if (!uploadedProfilePicture || !uploadedCompressedProfilePicture) {
           throw new InternalServerError(MESSAGES.IMAGE_ERROR);
         }

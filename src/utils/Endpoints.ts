@@ -3,8 +3,9 @@ const RESOURCE_PATH = {
   AUTH: "/auth",
   USER: "/user",
   STORE: "/store",
-  ADMIN_AUTH : "/admin/auth",
+  ADMIN_AUTH: "/admin/auth",
   ADMIN: "/admin",
+  STORE_MENU: "/store/menu",
 };
 const ENDPOINTS = {
   // Auth
@@ -25,10 +26,11 @@ const ENDPOINTS = {
   SEND_EMAIL_OTP: "/send-email-otp",
   VERIFY_EMAIL_OTP: "/verify-email-otp",
   RESEND_EMAIL_OTP: "/resend-email-otp",
-
+  CATEGORIES: "/categories",
   REGISTER_STORE: "/register",
   USER: "/user",
-
+  OPTIONS: "/options",
+  CHOICE: "/choice",
 
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",

@@ -1,0 +1,15 @@
+import { AuthMiddleware } from './../../middlewares/Auth.middleware';
+import express from "express";
+import multer from "multer";
+import { ENDPOINTS } from "../../utils/Endpoints";
+import MenuController from "../../controllers/Store/Menu.controller";
+const routes = express.Router();
+const menuController = new MenuController();
+const storage = multer.memoryStorage();
+const upload = multer({ storage }).single("image");
+routes.get(ENDPOINTS.CATEGORIES, AuthMiddleware ,menuController.getCategories);
+routes.get(ENDPOINTS.OPTIONS, AuthMiddleware, menuController.getOptions);
+routes.get(`${ENDPOINTS.CHOICE}/:optionId`, AuthMiddleware, menuController.getChoices);
+routes.post("/", AuthMiddleware, upload, menuController.addMenuitem);
+routes.get("/", AuthMiddleware, menuController.getMenuItems);
+export default routes;
