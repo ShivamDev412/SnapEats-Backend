@@ -112,4 +112,14 @@ const removeStoreFromUser = async (userId: any, storeId: any) => {
 // userAddress();
 // removeStoreFromUser("clwlp9hkg0000ype13yejj8p9","clx4ten3l0001ujn69jqxoxx5")
 // removeRefreshToken();
-getUsers();
+const getChoice = () => {
+  prisma.predefinedChoice.findMany({
+    where:{
+      optionId:"clx97ona4005t118v5h2ftk1g"
+    }
+  }).then((choices) => {
+    console.log(choices);
+  })
+}
+getChoice()
+// getUsers();

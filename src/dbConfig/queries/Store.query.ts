@@ -1,5 +1,7 @@
 import { InternalServerError } from "../../utils/Error";
 import prisma from "..";
+import { Option } from "../../services/Store/Menu.service";
+import { getImage } from "../../utils/UploadToS3";
 
 const createStore = async (
   userId: string,
@@ -146,6 +148,150 @@ const getStoreEmailOtp = (id: string) => {
     select: { emailOtp: true, emailOtpExpiry: true },
   });
 };
+const getCategories = async () => {
+  try {
+    const categories = await prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+    return categories;
+  } catch (err: any) {
+    throw new InternalServerError(err.message);
+  }
+};
+const getOptions = async () => {
+  try {
+    return await prisma.option.findMany();
+  } catch (err: any) {
+    throw new InternalServerError(err.message);
+  }
+};
+const getChoiceByOptionId = async (optionId: string) => {
+  return await prisma.predefinedChoice.findMany({
+    where: {
+      optionId,
+    },
+  });
+};
+const createMenuItem = async (
+  name: string,
+  description: string,
+  basePrice: string,
+  categoryId: string,
+  image: string,
+  compressedImage: string,
+  storeId: string,
+  options?: Option[]
+) => {
+  const menuItemData: any = {
+    name,
+    description,
+    price: parseFloat(basePrice),
+    category: {
+      connect: {
+        id: categoryId,
+      },
+    },
+    store: {
+      connect: {
+        id: storeId,
+      },
+    },
+    image,
+    compressedImage,
+    isVeg: true,
+  };
+
+  if (options && options.length > 0) {
+    menuItemData.options = {
+      create: options.map((option) => ({
+        option: {
+          connect: {
+            id: option.optionId,
+          },
+        },
+        choices: {
+          create: option.choice.map((choice) => ({
+            predefinedChoiceId: choice.choiceId || null,
+            customChoice: choice.name || null,
+            additionalPrice: choice.additionalPrice,
+          })),
+        },
+      })),
+    };
+  }
+  try {
+    const newMenu = await prisma.menuItem.create({
+      data: menuItemData,
+    });
+    return newMenu;
+  } catch (err: any) {
+    throw new InternalServerError(err.message);
+  }
+};
+const getMenuItemsByStoreId = async (storeId: string) => {
+  const menuItems = await prisma.menuItem.findMany({
+    where: {
+      storeId: storeId,
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true, // This will be treated as basePrice
+      image: true,
+      compressedImage: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      options: {
+        select: {
+          id: true,
+          optionId: true,
+          option: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          choices: {
+            select: {
+              id: true,
+              predefinedChoiceId: true,
+              predefinedChoice: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              customChoice: true,
+              additionalPrice: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const menuToSend = await Promise.all(
+    menuItems.map(async (menu) => {
+      return {
+        ...menu,
+        image: menu.image ? await getImage(menu.image) : null,
+        compressedImage: menu.compressedImage
+          ? await getImage(menu.compressedImage)
+          : null,
+      };
+    })
+  );
+
+  return menuToSend;
+};
 export {
   createStore,
   getStoreByEmail,
@@ -157,4 +303,9 @@ export {
   getStoreById,
   getPhoneNumberOTP,
   getStoreEmailOtp,
+  getCategories,
+  getOptions,
+  getChoiceByOptionId,
+  createMenuItem,
+  getMenuItemsByStoreId,
 };
