@@ -48,6 +48,7 @@ export const MESSAGES = {
   STORE_REQUEST_REJECTED: "Store registration request rejected",
   STORE_NOT_FOUND: "Store not found",
   IMAGE_NOT_FOUND: "Image not found",
+  MENU_NOT_FOUND : "Menu item not found",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",

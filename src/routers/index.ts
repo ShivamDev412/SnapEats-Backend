@@ -13,8 +13,7 @@ const routes = express.Router();
 
 routes.use(RESOURCE_PATH.AUTH, authRoute);
 routes.use(RESOURCE_PATH.USER, userRoute, userAddressRoute, userProfileRoute);
-routes.use(RESOURCE_PATH.STORE, storeRoute, storeProfileRoute);
-routes.use(RESOURCE_PATH.STORE_MENU, storeMenuRoute);
+routes.use(RESOURCE_PATH.STORE, storeRoute, storeProfileRoute, storeMenuRoute);
 routes.use(RESOURCE_PATH.ADMIN_AUTH, adminAutRoute);
 routes.use(RESOURCE_PATH.ADMIN, adminRoute);
 export default routes;

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "MenuItem" ADD COLUMN     "prepTime" DOUBLE PRECISION NOT NULL DEFAULT 0;
