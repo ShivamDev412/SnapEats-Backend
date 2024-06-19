@@ -5,7 +5,6 @@ const RESOURCE_PATH = {
   STORE: "/store",
   ADMIN_AUTH: "/admin/auth",
   ADMIN: "/admin",
-  STORE_MENU: "/store/menu",
 };
 const ENDPOINTS = {
   // Auth
@@ -31,6 +30,8 @@ const ENDPOINTS = {
   USER: "/user",
   OPTIONS: "/options",
   CHOICE: "/choice",
+  MENU: "/menu",
+  PROFILE: "/profile",
 
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",

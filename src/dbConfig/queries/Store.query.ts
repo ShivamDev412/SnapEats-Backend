@@ -1,7 +1,7 @@
 import { InternalServerError } from "../../utils/Error";
 import prisma from "..";
 import { Option } from "../../services/Store/Menu.service";
-import { getImage } from "../../utils/UploadToS3";
+import { create } from "domain";
 
 const createStore = async (
   userId: string,
@@ -154,6 +154,11 @@ const getCategories = async () => {
       select: {
         id: true,
         name: true,
+        menuItems: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     return categories;
@@ -183,12 +188,16 @@ const createMenuItem = async (
   image: string,
   compressedImage: string,
   storeId: string,
+  isVeg: boolean,
+  prepTime: number,
   options?: Option[]
 ) => {
   const menuItemData: any = {
     name,
     description,
     price: parseFloat(basePrice),
+    prepTime,
+    isVeg,
     category: {
       connect: {
         id: categoryId,
@@ -201,7 +210,6 @@ const createMenuItem = async (
     },
     image,
     compressedImage,
-    isVeg: true,
   };
 
   if (options && options.length > 0) {
@@ -231,17 +239,54 @@ const createMenuItem = async (
     throw new InternalServerError(err.message);
   }
 };
-const getMenuItemsByStoreId = async (storeId: string) => {
+const getMenuItemsByStoreId = async (
+  storeId: string,
+  categoryId: string | undefined
+) => {
+  const condition: {
+    storeId: string;
+    categoryId?: string;
+  } = {
+    storeId: storeId,
+  };
+  if (categoryId) {
+    condition["categoryId"] = categoryId;
+  }
   const menuItems = await prisma.menuItem.findMany({
+    where: condition,
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      image: true,
+      isVeg: true,
+      prepTime: true,
+      compressedImage: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+  return menuItems;
+};
+const getMenuItemById = async (storeId: string, menuId: string) => {
+  const menuItems = await prisma.menuItem.findUnique({
     where: {
-      storeId: storeId,
+      storeId,
+      id: menuId,
     },
     select: {
       id: true,
       name: true,
       description: true,
-      price: true, // This will be treated as basePrice
+      price: true,
       image: true,
+      isVeg: true,
+      prepTime: true,
       compressedImage: true,
       category: {
         select: {
@@ -278,20 +323,128 @@ const getMenuItemsByStoreId = async (storeId: string) => {
     },
   });
 
-  const menuToSend = await Promise.all(
-    menuItems.map(async (menu) => {
-      return {
-        ...menu,
-        image: menu.image ? await getImage(menu.image) : null,
-        compressedImage: menu.compressedImage
-          ? await getImage(menu.compressedImage)
-          : null,
-      };
-    })
-  );
-
-  return menuToSend;
+  return menuItems;
 };
+async function deleteMenuItemById(menuItemId: string) {
+  try {
+    const menuItemOptions = await prisma.menuItemOption.findMany({
+      where: {
+        menuItemId: menuItemId,
+      },
+      select: {
+        id: true,
+      },
+    });
+    const menuItemOptionIds = menuItemOptions.map((option) => option.id);
+    await prisma.menuItemChoice.deleteMany({
+      where: {
+        menuItemOptionId: {
+          in: menuItemOptionIds,
+        },
+      },
+    });
+    await prisma.menuItemOption.deleteMany({
+      where: {
+        menuItemId: menuItemId,
+      },
+    });
+    await prisma.menuItem.delete({
+      where: {
+        id: menuItemId,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+}
+async function updateMenuItem(
+  menuItemId: string,
+  name: string,
+  description: string,
+  basePrice: string,
+  categoryId: string,
+  image: string,
+  compressedImage: string,
+  storeId: string,
+  isVeg: boolean,
+  prepTime: number,
+  options?: {
+    optionId: string;
+    choice: {
+      choiceId: string;
+      name: string;
+      additionalPrice: number;
+    }[];
+  }[]
+) {
+  const menuItemData: any = {
+    name,
+    description,
+    price: parseFloat(basePrice),
+    prepTime,
+    isVeg,
+    category: {
+      connect: {
+        id: categoryId,
+      },
+    },
+    store: {
+      connect: {
+        id: storeId,
+      },
+    },
+    image,
+    compressedImage,
+    options: {
+      create: options?.map((option) => ({
+        option: {
+          connect: {
+            id: option.optionId,
+          },
+        },
+        choices: {
+          create: option.choice.map((choice) => ({
+            predefinedChoiceId: choice.choiceId || null,
+            customChoice: choice.name || null,
+            additionalPrice: choice.additionalPrice,
+          })),
+        },
+      })),
+    },
+  };
+  try {
+    const menuItemOptions = await prisma.menuItemOption.findMany({
+      where: {
+        menuItemId: menuItemId,
+      },
+      select: {
+        id: true,
+      },
+    });
+    const menuItemOptionIds = menuItemOptions.map((option) => option.id);
+    await prisma.menuItemChoice.deleteMany({
+      where: {
+        menuItemOptionId: {
+          in: menuItemOptionIds,
+        },
+      },
+    });
+    await prisma.menuItemOption.deleteMany({
+      where: {
+        menuItemId: menuItemId,
+      },
+    });
+    const updatedMenuItem = await prisma.menuItem.update({
+      where: {
+        id: menuItemId,
+      },
+      data: menuItemData,
+    });
+    return updatedMenuItem;
+  } catch (err: any) {
+    throw new Error(`Failed to update MenuItem: ${err.message}`);
+  }
+}
 export {
   createStore,
   getStoreByEmail,
@@ -308,4 +461,7 @@ export {
   getChoiceByOptionId,
   createMenuItem,
   getMenuItemsByStoreId,
+  getMenuItemById,
+  deleteMenuItemById,
+  updateMenuItem,
 };
