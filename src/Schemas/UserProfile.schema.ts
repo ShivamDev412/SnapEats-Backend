@@ -1,3 +1,4 @@
+import { passwordComplexity } from "../utils/Validations";
 import { VALIDATION_MESSAGES } from "../utils/Constant";
 import z from "zod";
 
@@ -17,7 +18,10 @@ const ResetPasswordSchema = z
   .object({
     password: z
       .string()
-      .min(1, { message: VALIDATION_MESSAGES.PASSWORD_REQUIRED }),
+      .min(1, VALIDATION_MESSAGES.NEW_PASSWORD_REQUIRED)
+      .refine(passwordComplexity, {
+        message: VALIDATION_MESSAGES.INVALID_PASSWORD,
+      }),
     confirmPassword: z
       .string()
       .min(1, { message: VALIDATION_MESSAGES.CONFIRM_PASSWORD_REQUIRED }),
@@ -27,4 +31,27 @@ const ResetPasswordSchema = z
     message: VALIDATION_MESSAGES.PASSWORDS_DO_NOT_MATCH,
     path: ["confirmPassword"],
   });
-export { UserProfileSchema, ResetPasswordSchema };
+const ChangePasswordSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(1, VALIDATION_MESSAGES.CURRENT_PASSWORD_REQUIRED),
+    newPassword: z
+      .string()
+      .min(1, VALIDATION_MESSAGES.NEW_PASSWORD_REQUIRED)
+      .refine(passwordComplexity, {
+        message: VALIDATION_MESSAGES.INVALID_PASSWORD,
+      }),
+    confirmNewPassword: z
+      .string()
+      .min(1, VALIDATION_MESSAGES.CONFIRM_PASSWORD_REQUIRED),
+  })
+  .refine((data) => data.newPassword === data.confirmNewPassword, {
+    message: VALIDATION_MESSAGES.PASSWORDS_DO_NOT_MATCH,
+    path: ["confirmNewPassword"],
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: VALIDATION_MESSAGES.CURRENT_AND_NEW_PASSWORDS_CANNOT_MATCH,
+    path: ["newPassword"],
+  });
+export { UserProfileSchema, ResetPasswordSchema, ChangePasswordSchema };

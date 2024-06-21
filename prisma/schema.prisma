@@ -38,6 +38,7 @@ model User {
   updatedAt                DateTime  @updatedAt
   passwordResetToken       String? // Token for password reset
   passwordResetTokenExpiry DateTime? // Token expiry date
+  language                 String?   @default("en")
 }
 
 model Address {

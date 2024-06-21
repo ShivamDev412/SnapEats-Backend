@@ -32,6 +32,8 @@ const ENDPOINTS = {
   CHOICE: "/choice",
   MENU: "/menu",
   PROFILE: "/profile",
+  CHANGE_LANGUAGE:"/change-language",
+  CHANGE_PASSWORD:"/change-password",
 
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",

@@ -1,5 +1,6 @@
 import { Address } from "@prisma/client";
 import prisma from "..";
+import { InternalServerError } from "../../utils/Error";
 
 const createUser = async (
   name: string,
@@ -22,23 +23,25 @@ const createUser = async (
     },
   });
 };
-const getUserByEmail = async (email: string, ) => {
+const getUserByEmail = async (email: string) => {
   return await prisma.user.findUnique({
     where: {
       email,
     },
   });
 };
-const getUserByPhoneNumber = async (phoneNumber: string,countryCode: string) => {
+const getUserByPhoneNumber = async (
+  phoneNumber: string,
+  countryCode: string
+) => {
   return await prisma.user.findFirst({
     where: {
       phoneNumber,
-      countryCode
+      countryCode,
     },
   });
-
-}
-const getUserById = async (id: string) => {
+};
+const getUserById = async (id: string, password?: boolean) => {
   return await prisma.user.findUnique({
     where: {
       id,
@@ -57,7 +60,8 @@ const getUserById = async (id: string) => {
       addresses: true,
       countryCode: true,
       googleId: true,
-
+      language: true,
+      password: password ? true : false,
     },
   });
 };
@@ -87,27 +91,32 @@ const getUserForgotPassword = async (id: string) => {
 };
 
 const updateUser = async (id: string, data: any) => {
-  return await prisma.user.update({
-    where: {
-      id,
-    },
-    data,
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      profilePicture: true,
-      compressedProfilePicture: true,
-      storeId: true,
-      emailVerified: true,
-      phoneNumberVerified: true,
-      phoneNumber: true,
-      defaultAddressId: true,
-      addresses: true,
-      countryCode: true,
-      googleId: true,
-    },
-  });
+  try {
+    return await prisma.user.update({
+      where: {
+        id,
+      },
+      data,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profilePicture: true,
+        compressedProfilePicture: true,
+        storeId: true,
+        emailVerified: true,
+        phoneNumberVerified: true,
+        phoneNumber: true,
+        defaultAddressId: true,
+        addresses: true,
+        countryCode: true,
+        googleId: true,
+        language: true,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
 const getUserAddressById = async (id: string) => {
   try {
@@ -144,9 +153,7 @@ const createAddress = async (id: string, data: Address) => {
       },
     });
     return newAddress;
-  } catch (err) {
-    
-  }
+  } catch (err) {}
 };
 const updateAddress = async (addressId: string, data: any) => {
   return await prisma.address.update({
@@ -209,5 +216,5 @@ export {
   markAddressAsDefault,
   getUserPhoneOtp,
   getUserEmailOtp,
-  getUserByPhoneNumber
+  getUserByPhoneNumber,
 };

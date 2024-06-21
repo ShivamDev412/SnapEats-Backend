@@ -62,10 +62,12 @@ class MenuController {
   getMenuItems = async (req: Request, res: Response, next: NextFunction) => {
     const storeId = req.user?.storeId;
     const categoryId = req.query.category as string;
+    const search = req.query.search as string;
     try {
       const menuToSend = await this.menuService.getMenu(
         storeId as string,
-        categoryId
+        categoryId,
+        search
       );
       res.json({
         data: menuToSend || [],

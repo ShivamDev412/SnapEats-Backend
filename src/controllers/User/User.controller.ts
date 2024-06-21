@@ -414,6 +414,6 @@ class UserController {
    *       500:
    *         description: Internal server error
    */
-
+  
 }
 export default UserController;

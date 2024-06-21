@@ -49,9 +49,7 @@ const createStore = async (
     return newStore;
   } catch (error: any) {
     throw new InternalServerError(error.message);
-  } finally {
-    await prisma.$disconnect();
-  }
+  } 
 };
 const getStoreByEmail = (email: string) => {
   return prisma.store.findFirst({
@@ -241,16 +239,29 @@ const createMenuItem = async (
 };
 const getMenuItemsByStoreId = async (
   storeId: string,
-  categoryId: string | undefined
+  categoryId: string | undefined,
+  search: string | undefined
 ) => {
   const condition: {
     storeId: string;
     categoryId?: string;
+    name?: {
+      contains: string;
+      mode: "insensitive";
+    };
   } = {
     storeId: storeId,
   };
+
   if (categoryId) {
-    condition["categoryId"] = categoryId;
+    condition.categoryId = categoryId;
+  }
+
+  if (search) {
+    condition.name = {
+      contains: search,
+      mode: "insensitive",
+    };
   }
   const menuItems = await prisma.menuItem.findMany({
     where: condition,
@@ -271,8 +282,10 @@ const getMenuItemsByStoreId = async (
       },
     },
   });
+
   return menuItems;
 };
+
 const getMenuItemById = async (storeId: string, menuId: string) => {
   const menuItems = await prisma.menuItem.findUnique({
     where: {
