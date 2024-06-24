@@ -49,6 +49,11 @@ export const MESSAGES = {
   STORE_NOT_FOUND: "Store not found",
   IMAGE_NOT_FOUND: "Image not found",
   MENU_NOT_FOUND : "Menu item not found",
+  LANGUAGE_UPDATED: "Language updated successfully",
+  PASSWORD_UPDATED: "Password updated successfully",
+  CURRENT_PASSWORD: "Your current password is incorrect",
+  FOOD_TYPE_ADDED: "Food type added successfully",
+  FOOD_TYPE_REMOVED: "Food type removed successfully",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
@@ -65,6 +70,9 @@ export const VALIDATION_MESSAGES = {
   CONFIRM_PASSWORD_REQUIRED: "Confirm password is required",
   PASSWORDS_DO_NOT_MATCH: "Password and confirm password do not match",
   TOKEN_REQUIRED: "Token is required",
+  CURRENT_PASSWORD_REQUIRED: "Current password is required",
+  NEW_PASSWORD_REQUIRED: "New password is required",
+  CURRENT_AND_NEW_PASSWORDS_CANNOT_MATCH:"Current and new password cannot be same",
   
 };
 export const STATUS_CODE = {
@@ -88,3 +96,4 @@ export const EMAIL_SUBJECT = {
   STORE_REGISTRATION_REJECTION: "Store Registration Rejected",
   STORE_REGISTRATION_SUCCESS: "Store Registration Successful",
 }
+export const GITHUB_EMAIL_API = "https://api.github.com/user/emails";

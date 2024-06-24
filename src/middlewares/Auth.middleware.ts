@@ -5,18 +5,19 @@ import { AuthError, ForbiddenError } from "../utils/Error";
 
 export type AuthPayload = {
   id: string;
-  email: string;
+  email?: string;
   storeId?: string;
 };
+
 declare global {
   namespace Express {
+    export interface User extends AuthPayload {}
     interface Request {
-      user?: AuthPayload;
+      user?: User;
       file?: Express.Multer.File;
     }
   }
 }
-
 
 export const AuthMiddleware = (
   request: Request,
@@ -26,14 +27,16 @@ export const AuthMiddleware = (
   const authHeader =
     request.headers.authorization || request.headers.Authorization;
   if (!authHeader?.includes("Bearer ")) {
-    return new AuthError(MESSAGES.INVALID_AUTH_HEADER);
+    return next(new AuthError(MESSAGES.INVALID_AUTH_HEADER));
   }
+
   const token = authHeader?.toString().split(" ")[1];
-  jwt.verify(token, process.env.JWT_SECRET!, (err, decode) => {
+
+  jwt.verify(token, process.env.JWT_SECRET!, (err, decoded) => {
     if (err) {
-      next(new ForbiddenError(MESSAGES.TOKEN_EXPIRED));
+      return next(new ForbiddenError(MESSAGES.TOKEN_EXPIRED));
     } else {
-      request.user = decode as AuthPayload;
+      request.user = decoded as AuthPayload;
       next();
     }
   });

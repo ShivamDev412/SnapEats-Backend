@@ -113,12 +113,13 @@ class MenuService {
       compressedImage: await getImage(newMenuItem.compressedImage as string),
     };
   }
-  async getMenu(storeId: string, categoryId: string | undefined) {
+  async getMenu(storeId: string, categoryId: string | undefined, search: string | undefined) {
     const store = await getStoreById(storeId);
     if (!store) throw new NotFoundError(MESSAGES.STORE_NOT_FOUND);
     const menuItems = await getMenuItemsByStoreId(
       storeId as string,
-      categoryId
+      categoryId,
+      search
     );
     const menuItemsToSend = await Promise.all(
       menuItems.map(async (menu) => {

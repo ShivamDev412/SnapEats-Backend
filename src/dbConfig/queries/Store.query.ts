@@ -49,8 +49,6 @@ const createStore = async (
     return newStore;
   } catch (error: any) {
     throw new InternalServerError(error.message);
-  } finally {
-    await prisma.$disconnect();
   }
 };
 const getStoreByEmail = (email: string) => {
@@ -241,16 +239,29 @@ const createMenuItem = async (
 };
 const getMenuItemsByStoreId = async (
   storeId: string,
-  categoryId: string | undefined
+  categoryId: string | undefined,
+  search: string | undefined
 ) => {
   const condition: {
     storeId: string;
     categoryId?: string;
+    name?: {
+      contains: string;
+      mode: "insensitive";
+    };
   } = {
     storeId: storeId,
   };
+
   if (categoryId) {
-    condition["categoryId"] = categoryId;
+    condition.categoryId = categoryId;
+  }
+
+  if (search) {
+    condition.name = {
+      contains: search,
+      mode: "insensitive",
+    };
   }
   const menuItems = await prisma.menuItem.findMany({
     where: condition,
@@ -271,8 +282,10 @@ const getMenuItemsByStoreId = async (
       },
     },
   });
+
   return menuItems;
 };
+
 const getMenuItemById = async (storeId: string, menuId: string) => {
   const menuItems = await prisma.menuItem.findUnique({
     where: {
@@ -445,6 +458,72 @@ async function updateMenuItem(
     throw new Error(`Failed to update MenuItem: ${err.message}`);
   }
 }
+const getFoodTypes = async () => {
+  try {
+    return await prisma.storeFoodTypes.findMany({
+      select: {
+        id: true,
+        foodType: true,
+      },
+    });
+  } catch (err: any) {
+    throw new InternalServerError(err.message);
+  }
+};
+const addFoodTypeToStore = async (id: string, storeId: string) => {
+  try {
+    return await prisma.storeFoodTypes.update({
+      where: { id },
+      data: { storeId },
+    });
+  } catch (err: any) {
+    throw new InternalServerError(err.message);
+  }
+};
+const removeFoodTypeFromStore = async (id: string) => {
+  try {
+    return await prisma.storeFoodTypes.update({
+      where: { id },
+      data: { storeId: null },
+    });
+  } catch (err: any) {
+    throw new InternalServerError(err.message);
+  }
+};
+const getFoodTypesForStore = async (storeId: string) => {
+  try {
+    const foodTypes = await prisma.storeFoodTypes.findMany({
+      where: { storeId: storeId },
+      select: {
+        foodType: true,
+        id: true,
+      },
+    });
+    return foodTypes;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+const getAllStores = async () => {
+  return prisma.store.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phoneNumber: true,
+      countryCode: true,
+      address: {
+        select: {
+          address: true,
+          lat: true,
+          lon: true,
+        },
+      },
+    },
+  });
+};
 export {
   createStore,
   getStoreByEmail,
@@ -464,4 +543,9 @@ export {
   getMenuItemById,
   deleteMenuItemById,
   updateMenuItem,
+  getFoodTypes,
+  addFoodTypeToStore,
+  removeFoodTypeFromStore,
+  getFoodTypesForStore,
+  getAllStores,
 };

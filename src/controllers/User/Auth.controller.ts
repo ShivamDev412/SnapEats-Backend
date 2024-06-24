@@ -6,7 +6,8 @@ import { updateUser } from "../../dbConfig/queries/User.query";
 import { MESSAGES, REFRESH_COOKIE, STATUS_CODE } from "../../utils/Constant";
 import { LoginSchema, SignupSchema } from "../../Schemas/UserAuth.schema";
 import { AuthError, InternalServerError } from "../../utils/Error";
-
+import dotenv from "dotenv";
+dotenv.config();
 //
 class AuthController {
   authService: AuthService;
@@ -208,6 +209,54 @@ class AuthController {
       } else {
         throw new InternalServerError(MESSAGES.UNEXPECTED_ERROR);
       }
+    } catch (error) {
+      next(error);
+    }
+  };
+  socialAuthCallback = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const cookies = req.cookies;
+      const userProfile = req.user as {
+        id: string;
+        displayName: string;
+        emails: { value: string }[];
+        photos: [{ value: string }];
+        provider: "google" | "github";
+      };
+
+      const { id, displayName, emails, photos, provider } = userProfile;
+      const email = emails && emails[0].value;
+      const profilePicture = photos && photos[0].value;
+      const { user, token, refreshToken, isStoreRegistered, userType } =
+        await this.authService.socialLoginOrSignup(
+          id,
+          displayName,
+          email,
+          profilePicture,
+          provider
+        );
+      if (userType === "existingUser") {
+        console.log(userType);
+        const newRefreshTokenArray = cookies[REFRESH_COOKIE]
+          ? user?.refreshTokens.filter(
+              (rt: string) => rt !== cookies[REFRESH_COOKIE]
+            )
+          : user?.refreshTokens;
+        if (cookies[REFRESH_COOKIE]) {
+          clearCookie(res, REFRESH_COOKIE);
+        }
+        await updateUser(user?.id as string, {
+          refreshTokens: [...newRefreshTokenArray, refreshToken],
+        });
+      }
+      setCookies(res, REFRESH_COOKIE, refreshToken);
+      res.redirect(
+        `${process.env.SUCCESS_REDIRECT_URL}?token=${token}&isStoreRegistered=${isStoreRegistered}`
+      );
     } catch (error) {
       next(error);
     }

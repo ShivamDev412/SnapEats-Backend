@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import {
   createUser,
+  createUserWithSocialSingUp,
   getUserByEmail,
   getUserById,
   updateUser,
@@ -17,7 +18,7 @@ class AuthService {
     const user = await getUserByEmail(email);
     if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user?.password as string);
     if (!isMatch) throw new AuthError(MESSAGES.INVALID_PASSWORD);
 
     const token = user.storeId
@@ -120,6 +121,73 @@ class AuthService {
         }
       );
       return { accessTokenToSend, refreshTokenToSend };
+    }
+  }
+  async socialLoginOrSignup(
+    id: string,
+    displayName: string,
+    email: string,
+    profilePicture: string,
+    provider: "google" | "github"
+  ) {
+    const user = await getUserByEmail(email);
+    switch (provider) {
+      case "google":
+        if (!user?.googleId) {
+          await updateUser(user?.id as string, {
+            googleId: id,
+          });
+        }
+        break;
+      case "github":
+        if (!user?.githubId) {
+          await updateUser(user?.id as string, {
+            githubId: id,
+          });
+        }
+        break;
+    }
+    let isStoreRegistered = false;
+    if (user) {
+      const token = user.storeId
+        ? createAuthToken(user.id, user.email, user?.storeId)
+        : createAuthToken(user.id, user.email);
+      const refreshToken = createRefreshToken(user.id);
+      if (user.storeId) {
+        const store = await getStoreByUserId(user.id);
+        store?.status === "APPROVED"
+          ? (isStoreRegistered = true)
+          : (isStoreRegistered = false);
+      }
+      return {
+        user,
+        token,
+        refreshToken,
+        isStoreRegistered,
+        userType: "existingUser",
+      };
+    } else {
+      const user = await createUserWithSocialSingUp(
+        displayName,
+        email,
+        id,
+        profilePicture,
+        provider
+      );
+      const token = user.storeId
+        ? createAuthToken(user.id, user.email, user?.storeId)
+        : createAuthToken(user.id, user.email);
+      const refreshToken = createRefreshToken(user.id);
+      await updateUser(user.id, {
+        refreshTokens: [refreshToken],
+      });
+      return {
+        user,
+        token,
+        refreshToken,
+        isStoreRegistered,
+        userType: "newUser",
+      };
     }
   }
 }
