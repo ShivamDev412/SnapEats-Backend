@@ -6,7 +6,7 @@ class ProfileController {
   private profileService: ProfileService;
   constructor() {
     this.profileService = new ProfileService();
-  } 
+  }
   /**
    * @swagger
    * /store/update-phone-number:
@@ -82,7 +82,7 @@ class ProfileController {
       next(error);
     }
   };
-   /**
+  /**
    * @swagger
    * /store/send-phoneNumber-otp:
    *   post:
@@ -120,7 +120,7 @@ class ProfileController {
    *         description: Internal server error
    */
 
-   sendPhoneNumberOTP = async (
+  sendPhoneNumberOTP = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -419,6 +419,196 @@ class ProfileController {
           message: MESSAGES.OTP_RESENT,
         });
       }
+    } catch (error) {
+      next(error);
+    }
+  };
+    /**
+   * @swagger
+   * /store/food-types:
+   *   get:
+   *     summary: Get all food types
+   *     tags: [Store]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *       200:
+   *         description: Successfully fetched food types
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     type: string
+   *                   example: ["Type 1", "Type 2"]
+   *       500:
+   *         description: Internal server error
+   */
+  getFoodTypes = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const foodTypes = await this.profileService.getFoodTypes();
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: foodTypes,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  /**
+   * @swagger
+   * /store/food-types:
+   *   post:
+   *     summary: Add a new food type
+   *     tags: [Store]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               id:
+   *                 type: string
+   *                 example: "food-type-id"
+   *     responses:
+   *       201:
+   *         description: Food type added successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     id:
+   *                       type: string
+   *                       example: "food-type-id"
+   *                 message:
+   *                   type: string
+   *                   example: "Food type added successfully"
+   *       500:
+   *         description: Internal server error
+   */
+  addFoodType = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.body;
+    const storeId = req.user?.storeId;
+    try {
+      const foodType = await this.profileService.addFoodType(
+        id,
+        storeId as string,
+      );
+      res.status(STATUS_CODE.CREATED).json({
+        success: true,
+        data: foodType,
+        message: MESSAGES.FOOD_TYPE_ADDED,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  /**
+   * @swagger
+   * /store/food-types:
+   *   delete:
+   *     summary: Remove a food type
+   *     tags: [Store]
+   *     security:
+   *       - bearerAuth: []
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               id:
+   *                 type: string
+   *                 example: "food-type-id"
+   *     responses:
+   *       200:
+   *         description: Food type removed successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: "Food type removed successfully"
+   *       500:
+   *         description: Internal server error
+   */
+  removeFoodType = async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.body;
+    const storeId = req.user?.storeId;
+    try {
+      await this.profileService.removeFoodType(id, storeId as string);
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        message: MESSAGES.FOOD_TYPE_REMOVED,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  /**
+   * @swagger
+   * /store/store-food-types:
+   *   get:
+   *     summary: Get food types for a store
+   *     tags: [Store]
+   *     security:
+   *       - bearerAuth: []
+   *     responses:
+   *       200:
+   *         description: Successfully fetched store food types
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     type: string
+   *                   example: ["Store Type 1", "Store Type 2"]
+   *       500:
+   *         description: Internal server error
+   */
+  getStoreFoodTypes = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const storeId = req.user?.storeId;
+    console.log(storeId);
+    try {
+      const foodTypes = await this.profileService.getStoreFoodTypes(
+        storeId as string
+      );
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: foodTypes,
+      });
     } catch (error) {
       next(error);
     }

@@ -14,7 +14,7 @@ model User {
   emailVerified            Boolean   @default(false) // Email verification
   emailOtp                 String? // OTP for email verification
   emailOtpExpiry           DateTime? // OTP expiry time for email verification
-  password                 String
+  password                 String?
   profilePicture           String?
   compressedProfilePicture String?
   phoneNumber              String?
@@ -32,6 +32,7 @@ model User {
   Store                    Store? // One to One relation
   googleId                 String?   @unique // For Social Login
   facebookId               String?   @unique // For Social Login
+  githubId                 String?   @unique // For Social Login
   stripeCustomerId         String?   @unique // Stripe Customer ID
   reviews                  Review[] // One to Many relation
   createdAt                DateTime  @default(now())
@@ -70,6 +71,7 @@ model Store {
   emailOtpExpiry      DateTime? // OTP expiry time for email verification
   image               String?
   compressedImage     String?
+  foodTypes           StoreFoodTypes[]
   user                User          @relation(fields: [userId], references: [id])
   userId              String        @unique
   address             StoreAddress? // One to One relation
@@ -86,7 +88,14 @@ enum StoreStatus {
   PENDING
   APPROVED
 }
-
+model StoreFoodTypes {
+  id        String   @id @default(cuid())
+  store     Store?   @relation(fields: [storeId], references: [id])
+  storeId   String?
+  foodType  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 model StoreAddress {
   id        String   @id @default(cuid())
   store     Store    @relation(fields: [storeId], references: [id])

@@ -52,6 +52,8 @@ export const MESSAGES = {
   LANGUAGE_UPDATED: "Language updated successfully",
   PASSWORD_UPDATED: "Password updated successfully",
   CURRENT_PASSWORD: "Your current password is incorrect",
+  FOOD_TYPE_ADDED: "Food type added successfully",
+  FOOD_TYPE_REMOVED: "Food type removed successfully",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
@@ -94,3 +96,4 @@ export const EMAIL_SUBJECT = {
   STORE_REGISTRATION_REJECTION: "Store Registration Rejected",
   STORE_REGISTRATION_SUCCESS: "Store Registration Successful",
 }
+export const GITHUB_EMAIL_API = "https://api.github.com/user/emails";

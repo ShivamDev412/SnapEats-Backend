@@ -5,6 +5,10 @@ import {
   updateStoreById,
   getPhoneNumberOTP,
   getStoreEmailOtp,
+  getFoodTypes,
+  addFoodTypeToStore,
+  removeFoodTypeFromStore,
+  getFoodTypesForStore,
 } from "../../dbConfig/queries/Store.query";
 import { MESSAGES } from "../../utils/Constant";
 import { getImage } from "../../utils/UploadToS3";
@@ -59,7 +63,7 @@ class ProfileService {
   }
   async verifyOTP(storeId: string, otp: string) {
     const store = await getPhoneNumberOTP(storeId);
-    
+
     if (!store) throw new NotFoundError(MESSAGES.STORE_NOT_FOUND);
     if (store?.phoneOtp !== otp)
       throw new InternalServerError(MESSAGES.INVALID_OTP);
@@ -89,7 +93,7 @@ class ProfileService {
     const opt = generateRandomOTP();
     const htmlTemplate = EmailVerificationTemplate(store.name, opt);
     const emailResponse = await sendToMail(email, "OTP", htmlTemplate);
-   const updatedStore = await updateStoreById(storeId, {
+    const updatedStore = await updateStoreById(storeId, {
       emailOtp: opt,
       emailOtpExpiry: new Date(Date.now() + 600000),
     });
@@ -124,6 +128,19 @@ class ProfileService {
       emailOtpExpiry: new Date(Date.now() + 600000),
     });
     return emailResponse;
+  }
+  async getFoodTypes() {
+    return await getFoodTypes();
+  }
+  async addFoodType(id: string, storeId: string) {
+    return await addFoodTypeToStore(id, storeId);
+  }
+  async removeFoodType(id: string, storeId: string) {
+    await removeFoodTypeFromStore(id);
+  }
+  async getStoreFoodTypes(storeId: string) {
+    const foodTypes = await getFoodTypesForStore(storeId);
+    return foodTypes;
   }
 }
 export default ProfileService;

@@ -23,6 +23,51 @@ const createUser = async (
     },
   });
 };
+const createUserWithSocialSingUp = async (
+  name: string,
+  email: string,
+  id: string,
+  profilePicture: string,
+  provider: string
+) => {
+  const data: {
+    name: string;
+    email: string;
+    profilePicture: string;
+    compressedProfilePicture: string;
+    googleId?: string;
+    githubId?: string;
+    facebookId?: string;
+  } = {
+    name,
+    email,
+    profilePicture,
+    compressedProfilePicture: profilePicture,
+  };
+  if (provider === "google") {
+    data.googleId = id;
+  } else if (provider === "github") {
+    data.githubId = id;
+  } else if (provider === "facebook") {
+    data.facebookId = id;
+  }
+  try {
+    return await prisma.user.create({
+      data,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        storeId: true,
+        profilePicture: true,
+        compressedProfilePicture: true,
+        refreshTokens: true,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
 const getUserByEmail = async (email: string) => {
   return await prisma.user.findUnique({
     where: {
@@ -202,6 +247,19 @@ const getUserEmailOtp = async (id: string) => {
     },
   });
 };
+const getStores = async () => {};
+const getUserByGoogleId = async (id: string) => {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        googleId: id,
+      },
+    });
+    return user;
+  } catch (err: any) {
+    throw new InternalServerError(err.message);
+  }
+};
 export {
   createUser,
   getUserByEmail,
@@ -217,4 +275,6 @@ export {
   getUserPhoneOtp,
   getUserEmailOtp,
   getUserByPhoneNumber,
+  getUserByGoogleId,
+  createUserWithSocialSingUp,
 };

@@ -35,5 +35,20 @@ routes.post(
   AuthMiddleware,
   userProfileController.resendEmailOTP
 );
-
+routes.get(ENDPOINTS.FOOD_TYPE, userProfileController.getFoodTypes);
+routes.post(
+  ENDPOINTS.FOOD_TYPE,
+  AuthMiddleware,
+  userProfileController.addFoodType
+);
+routes.delete(
+  ENDPOINTS.FOOD_TYPE,
+  AuthMiddleware,
+  userProfileController.removeFoodType
+);
+routes.get(
+  ENDPOINTS.STORE_FOOD_TYPE,
+  AuthMiddleware,
+  userProfileController.getStoreFoodTypes
+);
 export default routes;

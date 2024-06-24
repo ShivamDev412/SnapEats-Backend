@@ -34,7 +34,10 @@ const ENDPOINTS = {
   PROFILE: "/profile",
   CHANGE_LANGUAGE:"/change-language",
   CHANGE_PASSWORD:"/change-password",
-
+  FOOD_TYPE: "/food-type",
+  STORE_FOOD_TYPE: "/store-food-type",
+  GOOGLE_AUTH_CALLBACK: "/google/callback",
+  GITHUB_AUTH_CALLBACK: "/github/callback",
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",

@@ -15,7 +15,7 @@ class SettingsService {
     const user = await getUserById(userId, true);
 
     if (!user) throw new NotFoundError(MESSAGES.USER_NOT_FOUND);
-    const isMatch = await bcrypt.compare(currentPassword, user?.password);
+    const isMatch = await bcrypt.compare(currentPassword, user?.password as string);
 
     if (!isMatch) throw new AuthError(MESSAGES.CURRENT_PASSWORD);
     const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
