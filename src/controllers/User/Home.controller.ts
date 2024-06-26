@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import HomeService from "@/services/User/Home.service";
+import HomeService from "../../services/User/Home.service";
 type GetStoreQuery = {
   lat: number;
-  lan: number;
+  lon: number;
   search: string;
   foodTypeId: string;
 };
@@ -12,12 +12,12 @@ class HomeController {
     this.homeService = new HomeService();
   }
   getStores = async (req: Request, res: Response, next: NextFunction) => {
-    const { lat, lan, search, foodTypeId } =
+    const { lat, lon, search, foodTypeId } =
       req.query as unknown as GetStoreQuery;
     try {
       const stores = await this.homeService.getStores(
         lat,
-        lan,
+        lon,
         search,
         foodTypeId
       );

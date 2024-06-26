@@ -54,6 +54,7 @@ export const MESSAGES = {
   CURRENT_PASSWORD: "Your current password is incorrect",
   FOOD_TYPE_ADDED: "Food type added successfully",
   FOOD_TYPE_REMOVED: "Food type removed successfully",
+  STORE_TIMING_UPDATED: "Store timing updated successfully",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
@@ -73,6 +74,7 @@ export const VALIDATION_MESSAGES = {
   CURRENT_PASSWORD_REQUIRED: "Current password is required",
   NEW_PASSWORD_REQUIRED: "New password is required",
   CURRENT_AND_NEW_PASSWORDS_CANNOT_MATCH:"Current and new password cannot be same",
+
   
 };
 export const STATUS_CODE = {
@@ -97,3 +99,22 @@ export const EMAIL_SUBJECT = {
   STORE_REGISTRATION_SUCCESS: "Store Registration Successful",
 }
 export const GITHUB_EMAIL_API = "https://api.github.com/user/emails";
+export const specialEventDates = [
+  "2024-01-01",
+  "2024-02-19",
+  "2024-03-29",
+  "2024-04-01",
+  "2024-05-20",
+  "2024-07-01",
+  "2024-09-02",
+  "2024-10-14",
+  "2024-11-11",
+  "2024-12-25",
+  "2024-12-26",
+  "2024-06-21",
+  "2024-06-24",
+  "2024-09-30",
+];
+export const DISTANCE_LIMIT = 20;
+export const AVERAGE_SPEED_MPH = 31;
+export const EXTRA_MINUTE = 5;

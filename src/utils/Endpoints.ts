@@ -5,6 +5,7 @@ const RESOURCE_PATH = {
   STORE: "/store",
   ADMIN_AUTH: "/admin/auth",
   ADMIN: "/admin",
+  HOME: "/home",
 };
 const ENDPOINTS = {
   // Auth
@@ -42,6 +43,8 @@ const ENDPOINTS = {
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",
   REJECT_STORE_REQUEST: "/reject-store-request",
+  HOME: "/home",
+  STORE_TIMING: "/store-timing",
 };
 
 export { ENDPOINTS, BASE_PATH, RESOURCE_PATH };

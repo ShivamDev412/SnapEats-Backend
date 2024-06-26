@@ -22,12 +22,14 @@ const s3 = new S3Client({
 export const uploadToS3 = async (
   name: string,
   image: any,
-  contentType: any
+  contentType: any,
+  height: number = 1024,
+  width: number = 1024
 ) => {
   const compressedImage = await sharp(image)
     .resize({
-      // width: 1920,
-      // height: 1080,
+      width,
+      height,
       fit: "contain",
     })
     .toFormat("webp")
@@ -71,7 +73,7 @@ export const uploadCompressedImageToS3 = async (
   image: any,
   contentType: any
 ) => {
-  const targetFileSize = 50 * 1024;
+  const targetFileSize = 1024; 
 
   let compressedImageBuffer = await sharp(image)
     .resize({
@@ -82,12 +84,24 @@ export const uploadCompressedImageToS3 = async (
     .toFormat("webp")
     .toBuffer({ resolveWithObject: true });
 
-  let quality = 90;
+  let quality = 20;
   while (compressedImageBuffer.info.size > targetFileSize && quality >= 10) {
     compressedImageBuffer = await sharp(image)
       .resize({
-        width: 4,
-        height: 4,
+        width: Math.max(
+          4,
+          Math.floor(
+            (compressedImageBuffer.info.width * targetFileSize) /
+              compressedImageBuffer.info.size
+          )
+        ),
+        height: Math.max(
+          4,
+          Math.floor(
+            (compressedImageBuffer.info.height * targetFileSize) /
+              compressedImageBuffer.info.size
+          )
+        ),
         fit: "contain",
       })
       .webp({ quality })
@@ -99,6 +113,7 @@ export const uploadCompressedImageToS3 = async (
     const randomBytes = crypto.randomBytes(byteLength);
     return randomBytes.toString("hex");
   };
+
   const randomImageName = generateRandomName();
 
   const params = {

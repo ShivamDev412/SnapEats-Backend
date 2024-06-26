@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { MESSAGES, STATUS_CODE } from "../../utils/Constant";
 import ProfileService from "../../services/Store/Profile.service";
+import { getStoreTime } from "../../dbConfig/queries/Store.query";
 
 class ProfileController {
   private profileService: ProfileService;
@@ -608,6 +609,36 @@ class ProfileController {
       res.status(STATUS_CODE.OK).json({
         success: true,
         data: foodTypes,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  updateStoreTiming = async (req: Request, res: Response, next: NextFunction) => {
+    const storeId = req.user?.storeId;
+    const { openTime, closeTime, type } = req.body;
+    try {
+      const updatedStore = await this.profileService.setStoreTiming(
+        storeId as string,
+        openTime, closeTime, type
+      );
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: updatedStore,
+        message: MESSAGES.STORE_TIMING_UPDATED,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  getStoreTiming = async (req: Request, res: Response, next: NextFunction) => {
+    const storeId = req.user?.storeId;
+    try {
+      const storeTiming = await getStoreTime(storeId as string);
+      console.log(storeTiming);
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: storeTiming,
       });
     } catch (error) {
       next(error);

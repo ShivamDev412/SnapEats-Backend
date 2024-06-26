@@ -511,9 +511,28 @@ const getAllStores = async () => {
     select: {
       id: true,
       name: true,
-      email: true,
-      phoneNumber: true,
-      countryCode: true,
+      image: true,
+      compressedImage: true,
+      openTime: true,
+      closeTime: true,
+      specialEventCloseTime: true,
+      specialEventOpenTime: true,
+      menuItems: {
+        select: { prepTime: true },
+      },
+      reviews: {
+        select: {
+          rating: true,
+          comment: true,
+          createdAt: true,
+          user: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+        },
+      },
       address: {
         select: {
           address: true,
@@ -521,8 +540,31 @@ const getAllStores = async () => {
           lon: true,
         },
       },
+      foodTypes: {
+        select: {
+          foodType: true,
+        },
+      },
     },
   });
+};
+const getStoreTime = async (storeId: string) => {
+  try {
+    return prisma.store.findFirst({
+      where: {
+        id: storeId,
+      },
+      select: {
+        id: true,
+        openTime: true,
+        closeTime: true,
+        specialEventCloseTime: true,
+        specialEventOpenTime: true,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
 export {
   createStore,
@@ -548,4 +590,5 @@ export {
   removeFoodTypeFromStore,
   getFoodTypesForStore,
   getAllStores,
+  getStoreTime,
 };
