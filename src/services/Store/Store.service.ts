@@ -102,7 +102,9 @@ class StoreService {
         const uploadedProfilePicture = await uploadToS3(
           name,
           file?.buffer,
-          file?.mimetype
+          file?.mimetype,
+          1080,
+          1920
         );
         const uploadedCompressedProfilePicture =
           await uploadCompressedImageToS3(name, file?.buffer, file?.mimetype);

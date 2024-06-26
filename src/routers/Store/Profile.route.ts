@@ -51,4 +51,11 @@ routes.get(
   AuthMiddleware,
   userProfileController.getStoreFoodTypes
 );
+routes.get(ENDPOINTS.STORE_TIMING, userProfileController.getStoreTiming);
+routes.put(
+  ENDPOINTS.STORE_TIMING,
+  AuthMiddleware,
+  userProfileController.updateStoreTiming
+);
+
 export default routes;

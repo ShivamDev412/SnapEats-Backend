@@ -58,29 +58,34 @@ model Address {
 }
 
 model Store {
-  id                  String        @id @default(cuid())
-  name                String
-  countryCode         String
-  phoneNumber         String
-  phoneNumberVerified Boolean       @default(false) // Phone number verification
-  phoneOtp            String? // OTP for phone number verification
-  phoneOtpExpiry      DateTime? // OTP expiry time for phone number verification
-  email               String
-  emailVerified       Boolean       @default(false) // Email verification
-  emailOtp            String? // OTP for email verification
-  emailOtpExpiry      DateTime? // OTP expiry time for email verification
-  image               String?
-  compressedImage     String?
-  foodTypes           StoreFoodTypes[]
-  user                User          @relation(fields: [userId], references: [id])
-  userId              String        @unique
-  address             StoreAddress? // One to One relation
-  orders              Order[] // One to Many relation
-  menuItems           MenuItem[] // One to Many relation
-  reviews             Review[] // One to Many relation
-  status              StoreStatus   @default(PENDING)
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  id                    String           @id @default(cuid())
+  name                  String
+  countryCode           String
+  phoneNumber           String
+  phoneNumberVerified   Boolean          @default(false) // Phone number verification
+  phoneOtp              String? // OTP for phone number verification
+  phoneOtpExpiry        DateTime? // OTP expiry time for phone number verification
+  email                 String
+  emailVerified         Boolean          @default(false) // Email verification
+  emailOtp              String? // OTP for email verification
+  emailOtpExpiry        DateTime? // OTP expiry time for email verification
+  image                 String?
+  compressedImage       String?
+  foodTypes             StoreFoodTypes[]
+  user                  User             @relation(fields: [userId], references: [id])
+  userId                String           @unique
+  address               StoreAddress? // One to One relation
+  orders                Order[] // One to Many relation
+  menuItems             MenuItem[] // One to Many relation
+  openTime              DateTime?
+  closeTime             DateTime?
+  specialEventOpenTime  DateTime?
+  specialEventCloseTime DateTime?
+  deliveryFee           Float?
+  reviews               Review[] // One to Many relation
+  status                StoreStatus      @default(PENDING)
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
 }
 
 enum StoreStatus {
@@ -88,6 +93,7 @@ enum StoreStatus {
   PENDING
   APPROVED
 }
+
 model StoreFoodTypes {
   id        String   @id @default(cuid())
   store     Store?   @relation(fields: [storeId], references: [id])
@@ -96,6 +102,7 @@ model StoreFoodTypes {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 model StoreAddress {
   id        String   @id @default(cuid())
   store     Store    @relation(fields: [storeId], references: [id])

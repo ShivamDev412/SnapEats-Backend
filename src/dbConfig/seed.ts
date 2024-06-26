@@ -59,7 +59,7 @@ const removeStoreFromUser = async (userId: any, storeId: any) => {
     await prisma.$disconnect();
   }
 };
-// getStore();
+
 
 // const categories = [
 //   'Breakfast',
@@ -121,5 +121,8 @@ const getChoice = () => {
     console.log(choices);
   })
 }
-getChoice()
+// getChoice()
 // getUsers();
+// removeStoreFromUser("clwlp9hkg0000ype13yejj8p9","clx4uaa290001n1g6ynkmlht9")
+// removeStoreFromUser("clxd6s6to000010sdz4fhiwt4","clxd7batf000210sdg60ic69m")
+getStore();

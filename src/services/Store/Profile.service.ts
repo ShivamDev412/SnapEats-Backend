@@ -1,3 +1,4 @@
+import moment from "moment-timezone";
 import { InternalServerError, NotFoundError } from "../../utils/Error";
 import {
   getStoreById,
@@ -17,6 +18,9 @@ import { EmailVerificationTemplate } from "../../utils/EmailTemplates";
 import { sendToMail } from "../../utils/NodeMailer";
 import generateRandomOTP from "../../utils/GenerateOTP";
 import sentOTP from "../../utils/Twillo";
+const timeStringToDate = (timeString: string): Date => {
+  return moment.tz(timeString, "HH:mm", "America/Toronto").toDate();
+};
 class ProfileService {
   async updatePhoneNumber(
     storeId: string,
@@ -141,6 +145,31 @@ class ProfileService {
   async getStoreFoodTypes(storeId: string) {
     const foodTypes = await getFoodTypesForStore(storeId);
     return foodTypes;
+  }
+  async setStoreTiming(
+    storeId: string,
+    openTime: string,
+    closeTime: string,
+    type: string
+  ) {
+    const store = await getStoreById(storeId);
+    if (!store) throw new NotFoundError(MESSAGES.STORE_NOT_FOUND);
+    const openTimeDate = timeStringToDate(openTime);
+    const closeTimeDate = timeStringToDate(closeTime);
+
+    const updatedStore = await updateStoreById(
+      storeId,
+      type === "normalDay"
+        ? {
+            openTime,
+            closeTime,
+          }
+        : {
+            specialEventOpenTime: openTime,
+            specialEventCloseTime: closeTime,
+          }
+    );
+    return updatedStore;
   }
 }
 export default ProfileService;
