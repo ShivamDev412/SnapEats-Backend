@@ -39,12 +39,14 @@ const ENDPOINTS = {
   STORE_FOOD_TYPE: "/store-food-type",
   GOOGLE_AUTH_CALLBACK: "/google/callback",
   GITHUB_AUTH_CALLBACK: "/github/callback",
+  STORE_TIMING: "/store-timing",
+  HOME_STORE_DETAILS: "/home-store-details",
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",
   REJECT_STORE_REQUEST: "/reject-store-request",
   HOME: "/home",
-  STORE_TIMING: "/store-timing",
+ 
 };
 
 export { ENDPOINTS, BASE_PATH, RESOURCE_PATH };

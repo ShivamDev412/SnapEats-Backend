@@ -2,27 +2,26 @@ import { Address } from "@prisma/client";
 import prisma from "..";
 import { InternalServerError } from "../../utils/Error";
 
-const createUser = async (
-  name: string,
-  email: string,
-  password: string
-  // profilePicture: string,
-  // compressedProfilePicture: string
-) => {
-  return await prisma.user.create({
-    data: {
-      name,
-      email,
-      password,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      storeId: true,
-    },
-  });
+const createUser = async (name: string, email: string, password: string) => {
+  try {
+    return await prisma.user.create({
+      data: {
+        name,
+        email,
+        password,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        storeId: true,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const createUserWithSocialSingUp = async (
   name: string,
   email: string,
@@ -68,71 +67,92 @@ const createUserWithSocialSingUp = async (
     throw new InternalServerError(error.message);
   }
 };
+
 const getUserByEmail = async (email: string) => {
-  return await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
+  try {
+    return await prisma.user.findUnique({
+      where: {
+        email,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
-const getUserByPhoneNumber = async (
-  phoneNumber: string,
-  countryCode: string
-) => {
-  return await prisma.user.findFirst({
-    where: {
-      phoneNumber,
-      countryCode,
-    },
-  });
+
+const getUserByPhoneNumber = async (phoneNumber: string, countryCode: string) => {
+  try {
+    return await prisma.user.findFirst({
+      where: {
+        phoneNumber,
+        countryCode,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const getUserById = async (id: string, password?: boolean) => {
-  return await prisma.user.findUnique({
-    where: {
-      id,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      profilePicture: true,
-      compressedProfilePicture: true,
-      storeId: true,
-      emailVerified: true,
-      phoneNumberVerified: true,
-      phoneNumber: true,
-      defaultAddressId: true,
-      addresses: true,
-      countryCode: true,
-      googleId: true,
-      language: true,
-      password: password ? true : false,
-    },
-  });
+  try {
+    return await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        profilePicture: true,
+        compressedProfilePicture: true,
+        storeId: true,
+        emailVerified: true,
+        phoneNumberVerified: true,
+        phoneNumber: true,
+        defaultAddressId: true,
+        addresses: true,
+        countryCode: true,
+        googleId: true,
+        language: true,
+        password: password ? true : false,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const getUserRefreshToken = async (id: string) => {
-  return await prisma.user.findUnique({
-    where: {
-      id,
-    },
-    select: {
-      refreshTokens: true,
-    },
-  });
+  try {
+    return await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        refreshTokens: true,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
 
 const getUserForgotPassword = async (id: string) => {
-  return await prisma.user.findUnique({
-    where: {
-      id,
-    },
-    select: {
-      id: true,
-      email: true,
-      passwordResetToken: true,
-      passwordResetTokenExpiry: true,
-    },
-  });
+  try {
+    return await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        email: true,
+        passwordResetToken: true,
+        passwordResetTokenExpiry: true,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
 
 const updateUser = async (id: string, data: any) => {
@@ -163,6 +183,7 @@ const updateUser = async (id: string, data: any) => {
     throw new InternalServerError(error.message);
   }
 };
+
 const getUserAddressById = async (id: string) => {
   try {
     const user = await prisma.user.findUnique({
@@ -185,10 +206,11 @@ const getUserAddressById = async (id: string) => {
     }));
 
     return addressesWithDefaultFlag;
-  } catch (err) {
-    throw err;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
   }
 };
+
 const createAddress = async (id: string, data: Address) => {
   try {
     const newAddress = await prisma.address.create({
@@ -198,56 +220,83 @@ const createAddress = async (id: string, data: Address) => {
       },
     });
     return newAddress;
-  } catch (err) {}
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const updateAddress = async (addressId: string, data: any) => {
-  return await prisma.address.update({
-    where: {
-      id: addressId,
-    },
-    data,
-  });
+  try {
+    return await prisma.address.update({
+      where: {
+        id: addressId,
+      },
+      data,
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const deleteAddress = async (id: string) => {
-  return await prisma.address.delete({
-    where: {
-      id,
-    },
-  });
+  try {
+    return await prisma.address.delete({
+      where: {
+        id,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const markAddressAsDefault = async (userId: string, addressId: string) => {
-  return await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      defaultAddressId: addressId,
-    },
-  });
+  try {
+    return await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        defaultAddressId: addressId,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const getUserPhoneOtp = async (id: string) => {
-  return await prisma.user.findUnique({
-    where: {
-      id,
-    },
-    select: {
-      phoneOtp: true,
-      phoneOtpExpiry: true,
-    },
-  });
+  try {
+    return await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        phoneOtp: true,
+        phoneOtpExpiry: true,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const getUserEmailOtp = async (id: string) => {
-  return await prisma.user.findUnique({
-    where: {
-      id,
-    },
-    select: {
-      emailOtp: true,
-      emailOtpExpiry: true,
-    },
-  });
+  try {
+    return await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        emailOtp: true,
+        emailOtpExpiry: true,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
-const getStores = async () => {};
+
 const getUserByGoogleId = async (id: string) => {
   try {
     const user = await prisma.user.findFirst({
@@ -256,10 +305,11 @@ const getUserByGoogleId = async (id: string) => {
       },
     });
     return user;
-  } catch (err: any) {
-    throw new InternalServerError(err.message);
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
   }
 };
+
 export {
   createUser,
   getUserByEmail,
