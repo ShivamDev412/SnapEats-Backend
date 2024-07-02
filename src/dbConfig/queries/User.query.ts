@@ -80,7 +80,10 @@ const getUserByEmail = async (email: string) => {
   }
 };
 
-const getUserByPhoneNumber = async (phoneNumber: string, countryCode: string) => {
+const getUserByPhoneNumber = async (
+  phoneNumber: string,
+  countryCode: string
+) => {
   try {
     return await prisma.user.findFirst({
       where: {
@@ -310,6 +313,24 @@ const getUserByGoogleId = async (id: string) => {
   }
 };
 
+const getCartByUserId = async (userId: string) => {
+  try {
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      select: {
+        items: {
+          select: {
+            menuItemId: true,
+            quantity: true,
+          },
+        },
+      },
+    });
+    return cart;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
 export {
   createUser,
   getUserByEmail,
@@ -327,4 +348,5 @@ export {
   getUserByPhoneNumber,
   getUserByGoogleId,
   createUserWithSocialSingUp,
+  getCartByUserId,
 };

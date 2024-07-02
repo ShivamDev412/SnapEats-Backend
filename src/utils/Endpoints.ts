@@ -40,7 +40,10 @@ const ENDPOINTS = {
   GOOGLE_AUTH_CALLBACK: "/google/callback",
   GITHUB_AUTH_CALLBACK: "/github/callback",
   STORE_TIMING: "/store-timing",
-  HOME_STORE_DETAILS: "/home-store-details",
+  HOME_STORE_PRIMARY_DETAILS: "/home-store-primary-details",
+  HOME_STORE_CATEGORY: "/home-store-category",
+  HOME_STORE_MENU: "/home-store-menu",
+  CART: "/cart",
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",

@@ -170,6 +170,7 @@ model MenuItemOption {
   menuItemId String
   option     Option           @relation(fields: [optionId], references: [id])
   optionId   String
+  isRequired Boolean          @default(false) // Whether the option is required or not
   choices    MenuItemChoice[] // One to Many relation
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt

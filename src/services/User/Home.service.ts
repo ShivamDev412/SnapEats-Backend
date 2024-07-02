@@ -1,13 +1,19 @@
 import calculateDistance from "../../utils/GetDistance";
 import {
   getAllStores,
-  getStoreHomeById,
+  getStoreMenuItems,
+  getStorePrimaryDetails,
 } from "../../dbConfig/queries/Store.query";
 import { getImage } from "../../utils/UploadToS3";
 import { DISTANCE_LIMIT, specialEventDates } from "../../utils/Constant";
 import moment from "moment";
-import { NotFoundError } from "../../utils/Error";
+import { InternalServerError, NotFoundError } from "../../utils/Error";
 import getTravelTime from "../../utils/TravelTime";
+import { getCartByUserId } from "../../dbConfig/queries/User.query";
+interface CartItem {
+  menuItemId: string;
+  quantity: number;
+}
 class HomeService {
   async getStores(
     lat: number,
@@ -85,30 +91,62 @@ class HomeService {
     );
     return dataToSend;
   }
-  async getStoreDetails(storeId: string, lat: number, lon: number) {
-    const store = await getStoreHomeById(storeId);
-    if (!store) throw new NotFoundError("Store not found");
-    const storeImage = await getImage(store?.image as string);
-    const storeCompressedImage = await getImage(
-      store?.compressedImage as string
-    );
-    const distance = calculateDistance(
-      lat,
-      lon,
-      store?.address?.lat as number,
-      store.address?.lon as number
-    );
-    const foodAverageCookTime =
-      store.menuItems.reduce((acc, type) => {
-        return acc + type.prepTime;
-      }, 0) / store.menuItems.length;
-    const isSpecialEventDate = (date: moment.Moment): boolean => {
-      const formattedDate = date.format("YYYY-MM-DD");
-      return specialEventDates.includes(formattedDate);
-    };
-    const travelTime = getTravelTime(foodAverageCookTime, distance);
-    const menuItems = await Promise.all(
-      store.menuItems.map(async (item) => {
+  async getStorePrimaryDetails(
+    storeId: string,
+    lat: number,
+    lon: number
+  ) {
+    try {
+      const store = await getStorePrimaryDetails(storeId);
+      const { averagePrepTime } = await getStoreMenuItems(storeId);
+
+      if (!store) throw new NotFoundError("Store not found");
+      const storeImage = await getImage(store?.image as string);
+      const storeCompressedImage = await getImage(
+        store?.compressedImage as string
+      );
+      const distance = calculateDistance(
+        lat,
+        lon,
+        store?.address?.lat as number,
+        store.address?.lon as number
+      );
+      const isSpecialEventDate = (date: moment.Moment): boolean => {
+        const formattedDate = date.format("YYYY-MM-DD");
+        return specialEventDates.includes(formattedDate);
+      };
+      const travelTime = getTravelTime(averagePrepTime, distance);
+      return {
+        ...store,
+        image: storeImage,
+        compressedImage: storeCompressedImage,
+        address: store.address?.address,
+        deliveryFee: distance < 3 ? 0 : distance * 0.5,
+        travelTime,
+        openTime: isSpecialEventDate(moment())
+          ? store.specialEventOpenTime
+          : store.openTime,
+        closeTime: isSpecialEventDate(moment())
+          ? store.specialEventCloseTime
+          : store.closeTime,
+      };
+    } catch (error: any) {
+      throw new InternalServerError(error.message);
+    }
+  }
+  async getStoreMenuItems(storeId: string, userId: string) {
+    const cart = await getCartByUserId(userId);
+    const { menuItems } = await getStoreMenuItems(storeId);
+    const cartItemsMap: { [key: string]: number } =
+      cart?.items.reduce(
+        (map: { [key: string]: number }, cartItem: CartItem) => {
+          map[cartItem.menuItemId] = cartItem.quantity;
+          return map;
+        },
+        {}
+      ) || {};
+    const menuItemsData = await Promise.all(
+      menuItems.map(async (item) => {
         const itemImage = await getImage(item.image as string);
         const itemCompressedImage = await getImage(
           item.compressedImage as string
@@ -117,24 +155,11 @@ class HomeService {
           ...item,
           image: itemImage,
           compressedImage: itemCompressedImage,
+          quantity: cartItemsMap[item.id] || 0,
         };
       })
     );
-    return {
-      ...store,
-      image: storeImage,
-      compressedImage: storeCompressedImage,
-      menuItems,
-      address: store.address?.address,
-      deliveryFee: distance < 3 ? 0 : distance * 0.5,
-      travelTime,
-      openTime: isSpecialEventDate(moment())
-        ? store.specialEventOpenTime
-        : store.openTime,
-      closeTime: isSpecialEventDate(moment())
-        ? store.specialEventCloseTime
-        : store.closeTime,
-    };
+    return menuItemsData;
   }
 }
 export default HomeService;

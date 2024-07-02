@@ -1,6 +1,7 @@
-import { InternalServerError } from "../../utils/Error";
+import { InternalServerError, NotFoundError } from "../../utils/Error";
 import prisma from "..";
 import { Option } from "../../services/Store/Menu.service";
+import { MESSAGES } from "../../utils/Constant";
 
 const createStore = async (
   userId: string,
@@ -63,7 +64,10 @@ const getStoreByEmail = async (email: string) => {
   }
 };
 
-const getStoreByPhoneNumber = async (phoneNumber: string, countryCode: string) => {
+const getStoreByPhoneNumber = async (
+  phoneNumber: string,
+  countryCode: string
+) => {
   try {
     return await prisma.store.findFirst({
       where: {
@@ -107,7 +111,144 @@ const getPendingStores = async () => {
     throw new InternalServerError(error.message);
   }
 };
+const getStorePrimaryDetails = async (storeId: string) => {
+  try {
+    const store = await prisma.store.findFirst({
+      where: {
+        id: storeId,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        countryCode: true,
+        image: true,
+        compressedImage: true,
+        openTime: true,
+        closeTime: true,
+        specialEventCloseTime: true,
+        specialEventOpenTime: true,
+        deliveryFee: true,
+        address: {
+          select: {
+            address: true,
+            lat: true,
+            lon: true,
+          },
+        },
+      },
+    });
+    return store;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
+const getStoreMenuItems = async (storeId: string) => {
+  try {
+    const store = await prisma.store.findUnique({
+      where: {
+        id: storeId,
+      },
+      select: {
+        menuItems: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            price: true,
+            image: true,
+            isVeg: true,
+            prepTime: true,
+            compressedImage: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            options: {
+              select: {
+                id: true,
+                isRequired: true,
+                option: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                choices: {
+                  select: {
+                    id: true,
+                    predefinedChoice: {
+                      select: {
+                        id: true,
+                        name: true,
+                      },
+                    },
+                    customChoice: true,
+                    additionalPrice: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
+    if (!store) {
+      throw new NotFoundError(MESSAGES.STORE_NOT_FOUND);
+    }
+    const totalPrepTime = store.menuItems.reduce(
+      (acc, item) => acc + item.prepTime,
+      0
+    );
+    const averagePrepTime = store.menuItems.length
+      ? totalPrepTime / store.menuItems.length
+      : 0;
+
+    return {
+      menuItems: store.menuItems,
+      averagePrepTime,
+    };
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
+const getStoreMenuCategories = async (storeId: string) => {
+  try {
+    const store = await prisma.store.findUnique({
+      where: {
+        id: storeId,
+      },
+      select: {
+        menuItems: {
+          select: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!store) {
+      throw new NotFoundError(MESSAGES.STORE_NOT_FOUND);
+    }
+    const categoriesData = store.menuItems.map((item) => item.category);
+    const categories = categoriesData.filter(
+      (category, index, self) =>
+        self.findIndex((t) => t.id === category.id) === index
+    );
+    return categories;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
 const getStoreHomeById = async (id: string) => {
   try {
     return await prisma.store.findFirst({
@@ -190,7 +331,6 @@ const getStoreHomeById = async (id: string) => {
     throw new InternalServerError(error.message);
   }
 };
-
 const getStoreById = async (id: string) => {
   try {
     return await prisma.store.findFirst({
@@ -349,6 +489,7 @@ const createMenuItem = async (
             id: option.optionId,
           },
         },
+        isRequired: option.isRequired,
         choices: {
           create: option.choice.map((choice) => ({
             predefinedChoiceId: choice.choiceId || null,
@@ -448,6 +589,7 @@ const getMenuItemById = async (storeId: string, menuId: string) => {
           select: {
             id: true,
             optionId: true,
+            isRequired: true,
             option: {
               select: {
                 id: true,
@@ -523,14 +665,7 @@ async function updateMenuItem(
   storeId: string,
   isVeg: boolean,
   prepTime: number,
-  options?: {
-    optionId: string;
-    choice: {
-      choiceId: string;
-      name: string;
-      additionalPrice: number;
-    }[];
-  }[]
+  options?: Option[]
 ) {
   const menuItemData: any = {
     name,
@@ -557,6 +692,7 @@ async function updateMenuItem(
             id: option.optionId,
           },
         },
+        isRequired: option.isRequired,
         choices: {
           create: option.choice.map((choice) => ({
             predefinedChoiceId: choice.choiceId || null,
@@ -567,7 +703,9 @@ async function updateMenuItem(
       })),
     },
   };
+
   try {
+    // Find the existing menu item options
     const menuItemOptions = await prisma.menuItemOption.findMany({
       where: {
         menuItemId: menuItemId,
@@ -576,7 +714,11 @@ async function updateMenuItem(
         id: true,
       },
     });
+
+    // Extract the ids of the menu item options
     const menuItemOptionIds = menuItemOptions.map((option) => option.id);
+
+    // Delete the related choices first
     await prisma.menuItemChoice.deleteMany({
       where: {
         menuItemOptionId: {
@@ -584,17 +726,22 @@ async function updateMenuItem(
         },
       },
     });
+
+    // Delete the menu item options
     await prisma.menuItemOption.deleteMany({
       where: {
         menuItemId: menuItemId,
       },
     });
+
+    // Update the menu item with the new data
     const updatedMenuItem = await prisma.menuItem.update({
       where: {
         id: menuItemId,
       },
       data: menuItemData,
     });
+
     return updatedMenuItem;
   } catch (error: any) {
     throw new InternalServerError(error.message);
@@ -745,4 +892,7 @@ export {
   getAllStores,
   getStoreTime,
   getStoreHomeById,
+  getStorePrimaryDetails,
+  getStoreMenuItems,
+  getStoreMenuCategories,
 };

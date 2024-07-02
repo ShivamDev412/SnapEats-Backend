@@ -6,9 +6,10 @@ import userProfileRoute from "./User/Profile.route";
 import settingsRoute from "./User/Settings.route";
 import adminAutRoute from "./Admin/Auth.route";
 import adminRoute from "./Admin/Admin.route";
+import cartRoute from "./User/Cart.route";
 import storeRoute from "./Store/Store.route";
 import storeMenuRoute from "./Store/Menu.route";
-import homeRoute from "./User/Home.route"
+import homeRoute from "./User/Home.route";
 import storeProfileRoute from "./Store/Profile.route";
 import { RESOURCE_PATH } from "../utils/Endpoints";
 const routes = express.Router();
@@ -19,7 +20,8 @@ routes.use(
   userRoute,
   userAddressRoute,
   userProfileRoute,
-  settingsRoute
+  settingsRoute,
+  cartRoute
 );
 routes.use(RESOURCE_PATH.HOME, homeRoute);
 routes.use(RESOURCE_PATH.STORE, storeRoute, storeProfileRoute, storeMenuRoute);
