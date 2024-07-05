@@ -252,6 +252,7 @@ model Cart {
   userId    String     @unique
   items     CartItem[]
   createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 }
 
 model CartItem {
@@ -265,15 +266,21 @@ model CartItem {
   price      Float
   options    CartItemOption[] // One to Many relation to capture selected customizations
   note       String? // Optional field for specific notes or instructions
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
 }
 
 model CartItemOption {
   id              String   @id @default(cuid())
   cartItem        CartItem @relation(fields: [cartItemId], references: [id])
   cartItemId      String
-  name            String // e.g., Size
-  choice          String // e.g., Medium
+  optionName      String // e.g., Size
+  optionId        String // Reference to the Option model
+  choiceName      String // e.g., Medium
+  choiceId        String? // Reference to the PredefinedChoice model
   additionalPrice Float? // Additional cost for the selected option
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model AdminUser {
