@@ -18,6 +18,7 @@ import {
 } from "../../utils/UploadToS3";
 export type Option = {
   optionId: string;
+  isRequired: boolean;
   choice: {
     choiceId: string;
     name: string;
@@ -70,6 +71,7 @@ class MenuService {
     if (options)
       optionsData = JSON.parse(options) as {
         optionId: string;
+        isRequired: boolean;
         choice: {
           choiceId: string;
           name: string;
@@ -79,6 +81,7 @@ class MenuService {
     const optionsToSend = optionsData?.map((option) => {
       return {
         optionId: option.optionId,
+        isRequired: option.isRequired,
         choice: option.choice.map((choice) => ({
           choiceId: choice.choiceId,
           name: choice.name,
@@ -167,6 +170,7 @@ class MenuService {
     let optionsData:
       | {
           optionId: string;
+          isRequired: boolean;
           choice: {
             choiceId: string;
             name: string;
@@ -184,6 +188,7 @@ class MenuService {
     }
     const optionsToSend = optionsData?.map((option) => ({
       optionId: option.optionId,
+      isRequired: option.isRequired,
       choice: option.choice.map((choice) => ({
         choiceId: choice.choiceId,
         name: choice.name,

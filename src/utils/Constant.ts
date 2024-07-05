@@ -52,9 +52,14 @@ export const MESSAGES = {
   LANGUAGE_UPDATED: "Language updated successfully",
   PASSWORD_UPDATED: "Password updated successfully",
   CURRENT_PASSWORD: "Your current password is incorrect",
-  FOOD_TYPE_ADDED: "Food type added successfully",
-  FOOD_TYPE_REMOVED: "Food type removed successfully",
-  STORE_TIMING_UPDATED: "Store timing updated successfully",
+  FOOD_TYPE_ADDED: "Food type added",
+  FOOD_TYPE_REMOVED: "Food type removed",
+  STORE_TIMING_UPDATED: "Store timing updated",
+  ITEM_ADDED_TO_CART : "Item added to cart",
+  ITEM_REMOVED_FROM_CART: "Item removed from cart",
+  CART_ITEM_QUANTITY_UPDATED: "Cart item quantity updated",
+  CART_ITEM_NOT_FOUND: "Cart item not found",
+  CART_FETCHED: "Cart fetched successfully",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",

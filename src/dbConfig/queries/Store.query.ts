@@ -1,7 +1,7 @@
-import { InternalServerError } from "../../utils/Error";
+import { InternalServerError, NotFoundError } from "../../utils/Error";
 import prisma from "..";
 import { Option } from "../../services/Store/Menu.service";
-import { create } from "domain";
+import { MESSAGES } from "../../utils/Constant";
 
 const createStore = async (
   userId: string,
@@ -51,62 +51,310 @@ const createStore = async (
     throw new InternalServerError(error.message);
   }
 };
-const getStoreByEmail = (email: string) => {
-  return prisma.store.findFirst({
-    where: {
-      email,
-    },
-  });
+
+const getStoreByEmail = async (email: string) => {
+  try {
+    return await prisma.store.findFirst({
+      where: {
+        email,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
-const getStoreByPhoneNumber = (phoneNumber: string, countryCode: string) => {
-  return prisma.store.findFirst({
-    where: {
-      phoneNumber,
-      countryCode,
-    },
-  });
+
+const getStoreByPhoneNumber = async (
+  phoneNumber: string,
+  countryCode: string
+) => {
+  try {
+    return await prisma.store.findFirst({
+      where: {
+        phoneNumber,
+        countryCode,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
-const getPendingStores = () => {
-  return prisma.store.findMany({
-    where: {
-      status: "PENDING",
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phoneNumber: true,
-      countryCode: true,
-      userId: true,
-      address: {
-        select: {
-          address: true,
+
+const getPendingStores = async () => {
+  try {
+    return await prisma.store.findMany({
+      where: {
+        status: "PENDING",
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        countryCode: true,
+        userId: true,
+        address: {
+          select: {
+            address: true,
+          },
+        },
+        user: {
+          select: {
+            name: true,
+            email: true,
+            id: true,
+          },
         },
       },
-      user: {
-        select: {
-          name: true,
-          email: true,
-          id: true,
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
+const getStorePrimaryDetails = async (storeId: string) => {
+  try {
+    const store = await prisma.store.findFirst({
+      where: {
+        id: storeId,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        countryCode: true,
+        image: true,
+        compressedImage: true,
+        openTime: true,
+        closeTime: true,
+        specialEventCloseTime: true,
+        specialEventOpenTime: true,
+        deliveryFee: true,
+        address: {
+          select: {
+            address: true,
+            lat: true,
+            lon: true,
+          },
         },
       },
-    },
-  });
+    });
+    return store;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
-const getStoreById = (id: string) => {
-  return prisma.store.findFirst({
-    where: {
-      id,
-    },
-  });
+const getStoreMenuItems = async (storeId: string) => {
+  try {
+    const store = await prisma.store.findUnique({
+      where: {
+        id: storeId,
+      },
+      select: {
+        menuItems: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            price: true,
+            image: true,
+            isVeg: true,
+            prepTime: true,
+            compressedImage: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            options: {
+              select: {
+                id: true,
+                isRequired: true,
+                option: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                choices: {
+                  select: {
+                    id: true,
+                    predefinedChoice: {
+                      select: {
+                        id: true,
+                        name: true,
+                      },
+                    },
+                    customChoice: true,
+                    additionalPrice: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!store) {
+      throw new NotFoundError(MESSAGES.STORE_NOT_FOUND);
+    }
+    const totalPrepTime = store.menuItems.reduce(
+      (acc, item) => acc + item.prepTime,
+      0
+    );
+    const averagePrepTime = store.menuItems.length
+      ? totalPrepTime / store.menuItems.length
+      : 0;
+
+    return {
+      menuItems: store.menuItems,
+      averagePrepTime,
+    };
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
-const getStoreByUserId = (id: string) => {
-  return prisma.store.findFirst({
-    where: {
-      userId: id,
-    },
-  });
+const getStoreMenuCategories = async (storeId: string) => {
+  try {
+    const store = await prisma.store.findUnique({
+      where: {
+        id: storeId,
+      },
+      select: {
+        menuItems: {
+          select: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!store) {
+      throw new NotFoundError(MESSAGES.STORE_NOT_FOUND);
+    }
+    const categoriesData = store.menuItems.map((item) => item.category);
+    const categories = categoriesData.filter(
+      (category, index, self) =>
+        self.findIndex((t) => t.id === category.id) === index
+    );
+    return categories;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+const getStoreHomeById = async (id: string) => {
+  try {
+    return await prisma.store.findFirst({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        countryCode: true,
+        image: true,
+        compressedImage: true,
+        userId: true,
+        openTime: true,
+        closeTime: true,
+        specialEventCloseTime: true,
+        specialEventOpenTime: true,
+        deliveryFee: true,
+        menuItems: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            price: true,
+            image: true,
+            isVeg: true,
+            prepTime: true,
+            compressedImage: true,
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            options: {
+              select: {
+                id: true,
+                option: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                choices: {
+                  select: {
+                    id: true,
+                    customChoice: true,
+                    additionalPrice: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        address: {
+          select: {
+            address: true,
+            lat: true,
+            lon: true,
+          },
+        },
+        reviews: {
+          select: {
+            rating: true,
+            comment: true,
+            user: {
+              select: {
+                name: true,
+                email: true,
+                id: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
+const getStoreById = async (id: string) => {
+  try {
+    return await prisma.store.findFirst({
+      where: {
+        id,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
+
+const getStoreByUserId = async (id: string) => {
+  try {
+    return await prisma.store.findFirst({
+      where: {
+        userId: id,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
+
 const updateStoreById = async (id: string, data: any) => {
   try {
     const updatedStore = await prisma.store.update({
@@ -118,34 +366,50 @@ const updateStoreById = async (id: string, data: any) => {
     throw new InternalServerError(error.message);
   }
 };
+
 const removeStoreById = async (userId: string, storeId: string) => {
-  await prisma.user.update({
-    where: { id: userId },
-    data: { storeId: null },
-  });
-  await prisma.storeAddress.delete({
-    where: {
-      storeId: storeId,
-    },
-  });
-  await prisma.store.delete({
-    where: {
-      id: storeId,
-    },
-  });
+  try {
+    await prisma.user.update({
+      where: { id: userId },
+      data: { storeId: null },
+    });
+    await prisma.storeAddress.delete({
+      where: {
+        storeId: storeId,
+      },
+    });
+    await prisma.store.delete({
+      where: {
+        id: storeId,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
-const getPhoneNumberOTP = (id: string) => {
-  return prisma.store.findFirst({
-    where: { id },
-    select: { phoneOtp: true, phoneOtpExpiry: true },
-  });
+
+const getPhoneNumberOTP = async (id: string) => {
+  try {
+    return await prisma.store.findFirst({
+      where: { id },
+      select: { phoneOtp: true, phoneOtpExpiry: true },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
-const getStoreEmailOtp = (id: string) => {
-  return prisma.store.findFirst({
-    where: { id },
-    select: { emailOtp: true, emailOtpExpiry: true },
-  });
+
+const getStoreEmailOtp = async (id: string) => {
+  try {
+    return await prisma.store.findFirst({
+      where: { id },
+      select: { emailOtp: true, emailOtpExpiry: true },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const getCategories = async () => {
   try {
     const categories = await prisma.category.findMany({
@@ -160,24 +424,31 @@ const getCategories = async () => {
       },
     });
     return categories;
-  } catch (err: any) {
-    throw new InternalServerError(err.message);
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
   }
 };
+
 const getOptions = async () => {
   try {
     return await prisma.option.findMany();
-  } catch (err: any) {
-    throw new InternalServerError(err.message);
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
   }
 };
+
 const getChoiceByOptionId = async (optionId: string) => {
-  return await prisma.predefinedChoice.findMany({
-    where: {
-      optionId,
-    },
-  });
+  try {
+    return await prisma.predefinedChoice.findMany({
+      where: {
+        optionId,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const createMenuItem = async (
   name: string,
   description: string,
@@ -218,6 +489,7 @@ const createMenuItem = async (
             id: option.optionId,
           },
         },
+        isRequired: option.isRequired,
         choices: {
           create: option.choice.map((choice) => ({
             predefinedChoiceId: choice.choiceId || null,
@@ -233,111 +505,122 @@ const createMenuItem = async (
       data: menuItemData,
     });
     return newMenu;
-  } catch (err: any) {
-    throw new InternalServerError(err.message);
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
   }
 };
+
 const getMenuItemsByStoreId = async (
   storeId: string,
   categoryId: string | undefined,
   search: string | undefined
 ) => {
-  const condition: {
-    storeId: string;
-    categoryId?: string;
-    name?: {
-      contains: string;
-      mode: "insensitive";
+  try {
+    const condition: {
+      storeId: string;
+      categoryId?: string;
+      name?: {
+        contains: string;
+        mode: "insensitive";
+      };
+    } = {
+      storeId: storeId,
     };
-  } = {
-    storeId: storeId,
-  };
 
-  if (categoryId) {
-    condition.categoryId = categoryId;
-  }
+    if (categoryId) {
+      condition.categoryId = categoryId;
+    }
 
-  if (search) {
-    condition.name = {
-      contains: search,
-      mode: "insensitive",
-    };
-  }
-  const menuItems = await prisma.menuItem.findMany({
-    where: condition,
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      image: true,
-      isVeg: true,
-      prepTime: true,
-      compressedImage: true,
-      category: {
-        select: {
-          id: true,
-          name: true,
+    if (search) {
+      condition.name = {
+        contains: search,
+        mode: "insensitive",
+      };
+    }
+    const menuItems = await prisma.menuItem.findMany({
+      where: condition,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        image: true,
+        isVeg: true,
+        prepTime: true,
+        compressedImage: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
         },
       },
-    },
-  });
+    });
 
-  return menuItems;
+    return menuItems;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
 
 const getMenuItemById = async (storeId: string, menuId: string) => {
-  const menuItems = await prisma.menuItem.findUnique({
-    where: {
-      storeId,
-      id: menuId,
-    },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      image: true,
-      isVeg: true,
-      prepTime: true,
-      compressedImage: true,
-      category: {
-        select: {
-          id: true,
-          name: true,
-        },
+  try {
+    const menuItems = await prisma.menuItem.findUnique({
+      where: {
+        storeId,
+        id: menuId,
       },
-      options: {
-        select: {
-          id: true,
-          optionId: true,
-          option: {
-            select: {
-              id: true,
-              name: true,
-            },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        image: true,
+        isVeg: true,
+        prepTime: true,
+        compressedImage: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
           },
-          choices: {
-            select: {
-              id: true,
-              predefinedChoiceId: true,
-              predefinedChoice: {
-                select: {
-                  id: true,
-                  name: true,
-                },
+        },
+        options: {
+          select: {
+            id: true,
+            optionId: true,
+            isRequired: true,
+            option: {
+              select: {
+                id: true,
+                name: true,
               },
-              customChoice: true,
-              additionalPrice: true,
+            },
+            choices: {
+              select: {
+                id: true,
+                predefinedChoiceId: true,
+                predefinedChoice: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                customChoice: true,
+                additionalPrice: true,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
 
-  return menuItems;
+    return menuItems;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 async function deleteMenuItemById(menuItemId: string) {
   try {
     const menuItemOptions = await prisma.menuItemOption.findMany({
@@ -370,6 +653,7 @@ async function deleteMenuItemById(menuItemId: string) {
     throw new InternalServerError(error.message);
   }
 }
+
 async function updateMenuItem(
   menuItemId: string,
   name: string,
@@ -381,14 +665,7 @@ async function updateMenuItem(
   storeId: string,
   isVeg: boolean,
   prepTime: number,
-  options?: {
-    optionId: string;
-    choice: {
-      choiceId: string;
-      name: string;
-      additionalPrice: number;
-    }[];
-  }[]
+  options?: Option[]
 ) {
   const menuItemData: any = {
     name,
@@ -415,6 +692,7 @@ async function updateMenuItem(
             id: option.optionId,
           },
         },
+        isRequired: option.isRequired,
         choices: {
           create: option.choice.map((choice) => ({
             predefinedChoiceId: choice.choiceId || null,
@@ -425,7 +703,9 @@ async function updateMenuItem(
       })),
     },
   };
+
   try {
+    // Find the existing menu item options
     const menuItemOptions = await prisma.menuItemOption.findMany({
       where: {
         menuItemId: menuItemId,
@@ -434,7 +714,11 @@ async function updateMenuItem(
         id: true,
       },
     });
+
+    // Extract the ids of the menu item options
     const menuItemOptionIds = menuItemOptions.map((option) => option.id);
+
+    // Delete the related choices first
     await prisma.menuItemChoice.deleteMany({
       where: {
         menuItemOptionId: {
@@ -442,22 +726,28 @@ async function updateMenuItem(
         },
       },
     });
+
+    // Delete the menu item options
     await prisma.menuItemOption.deleteMany({
       where: {
         menuItemId: menuItemId,
       },
     });
+
+    // Update the menu item with the new data
     const updatedMenuItem = await prisma.menuItem.update({
       where: {
         id: menuItemId,
       },
       data: menuItemData,
     });
+
     return updatedMenuItem;
-  } catch (err: any) {
-    throw new Error(`Failed to update MenuItem: ${err.message}`);
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
   }
 }
+
 const getFoodTypes = async () => {
   try {
     return await prisma.storeFoodTypes.findMany({
@@ -466,30 +756,33 @@ const getFoodTypes = async () => {
         foodType: true,
       },
     });
-  } catch (err: any) {
-    throw new InternalServerError(err.message);
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
   }
 };
+
 const addFoodTypeToStore = async (id: string, storeId: string) => {
   try {
     return await prisma.storeFoodTypes.update({
       where: { id },
       data: { storeId },
     });
-  } catch (err: any) {
-    throw new InternalServerError(err.message);
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
   }
 };
+
 const removeFoodTypeFromStore = async (id: string) => {
   try {
     return await prisma.storeFoodTypes.update({
       where: { id },
       data: { storeId: null },
     });
-  } catch (err: any) {
-    throw new InternalServerError(err.message);
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
   }
 };
+
 const getFoodTypesForStore = async (storeId: string) => {
   try {
     const foodTypes = await prisma.storeFoodTypes.findMany({
@@ -506,51 +799,57 @@ const getFoodTypesForStore = async (storeId: string) => {
     await prisma.$disconnect();
   }
 };
+
 const getAllStores = async () => {
-  return prisma.store.findMany({
-    select: {
-      id: true,
-      name: true,
-      image: true,
-      compressedImage: true,
-      openTime: true,
-      closeTime: true,
-      specialEventCloseTime: true,
-      specialEventOpenTime: true,
-      menuItems: {
-        select: { prepTime: true },
-      },
-      reviews: {
-        select: {
-          rating: true,
-          comment: true,
-          createdAt: true,
-          user: {
-            select: {
-              name: true,
-              id: true,
+  try {
+    return await prisma.store.findMany({
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        compressedImage: true,
+        openTime: true,
+        closeTime: true,
+        specialEventCloseTime: true,
+        specialEventOpenTime: true,
+        menuItems: {
+          select: { prepTime: true },
+        },
+        reviews: {
+          select: {
+            rating: true,
+            comment: true,
+            createdAt: true,
+            user: {
+              select: {
+                name: true,
+                id: true,
+              },
             },
           },
         },
-      },
-      address: {
-        select: {
-          address: true,
-          lat: true,
-          lon: true,
+        address: {
+          select: {
+            address: true,
+            lat: true,
+            lon: true,
+          },
+        },
+        foodTypes: {
+          select: {
+            foodType: true,
+          },
         },
       },
-      foodTypes: {
-        select: {
-          foodType: true,
-        },
-      },
-    },
-  });
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
 };
+
 const getStoreTime = async (storeId: string) => {
   try {
-    return prisma.store.findFirst({
+    return await prisma.store.findFirst({
       where: {
         id: storeId,
       },
@@ -566,6 +865,7 @@ const getStoreTime = async (storeId: string) => {
     throw new InternalServerError(error.message);
   }
 };
+
 export {
   createStore,
   getStoreByEmail,
@@ -591,4 +891,8 @@ export {
   getFoodTypesForStore,
   getAllStores,
   getStoreTime,
+  getStoreHomeById,
+  getStorePrimaryDetails,
+  getStoreMenuItems,
+  getStoreMenuCategories,
 };
