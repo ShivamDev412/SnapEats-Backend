@@ -1,4 +1,4 @@
-import { MESSAGES } from "../../utils/Constant";
+import { MESSAGES, STATUS_CODE } from "../../utils/Constant";
 import {
   addToCart,
   getCart,
@@ -75,15 +75,7 @@ class CartController {
         cartItemId,
         quantity
       );
-
-      if (updatedCartItem.count === 0) {
-        return res.status(404).json({
-          message: MESSAGES.CART_ITEM_NOT_FOUND,
-          success: false,
-        });
-      }
-
-      res.status(200).json({
+      res.status(STATUS_CODE.OK).json({
         message: MESSAGES.CART_ITEM_QUANTITY_UPDATED,
         data: updatedCartItem,
         success: true,
@@ -97,16 +89,8 @@ class CartController {
     try {
       const userId = req.user?.id as string;
       const { cartItemId } = req.body;
-      const result = await removeFromCart(userId, cartItemId);
-
-      if (result.count === 0) {
-        return res.status(404).json({
-          message: MESSAGES.CART_ITEM_NOT_FOUND,
-          success: false,
-        });
-      }
-
-      res.status(200).json({
+      await removeFromCart(userId, cartItemId);
+      res.status(STATUS_CODE.OK).json({
         message: MESSAGES.ITEM_REMOVED_FROM_CART,
         success: true,
       });
