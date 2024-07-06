@@ -1,5 +1,6 @@
 import { InternalServerError } from "../../../utils/Error";
 import prisma from "../../../dbConfig";
+import { MESSAGES } from "../../../utils/Constant";
 
 const getCart = async (userId: string) => {
   try {
@@ -11,6 +12,9 @@ const getCart = async (userId: string) => {
         items: {
           include: {
             options: true,
+          },
+          orderBy: {
+            createdAt: 'desc', 
           },
         },
       },
@@ -100,17 +104,28 @@ const updateCartQuantity = async (
   quantity: number
 ) => {
   try {
-    const updatedCartItem = await prisma.cartItem.updateMany({
+    const cartItem = await prisma.cartItem.findFirst({
       where: {
         id: cartItemId,
         cart: {
-          userId,
+          userId: userId,
         },
+      },
+    });
+
+    if (!cartItem) {
+      throw new InternalServerError(MESSAGES.CART_NOT_FOUND);
+    }
+
+    const updatedCartItem = await prisma.cartItem.update({
+      where: {
+        id: cartItemId,
       },
       data: {
         quantity,
       },
     });
+    
     return updatedCartItem;
   } catch (error: any) {
     throw new InternalServerError(error.message);
@@ -119,14 +134,18 @@ const updateCartQuantity = async (
 
 const removeFromCart = async (userId: string, cartItemId: string) => {
   try {
-    const deletedCartItem = await prisma.cartItem.deleteMany({
+    await prisma.cartItemOption.deleteMany({
       where: {
-        id: cartItemId,
-        cart: {
-          userId,
-        },
+        cartItemId: cartItemId,
       },
     });
+
+    const deletedCartItem = await prisma.cartItem.delete({
+      where: {
+        id: cartItemId,
+      },
+    });
+
     return deletedCartItem;
   } catch (error: any) {
     throw new InternalServerError(error.message);
