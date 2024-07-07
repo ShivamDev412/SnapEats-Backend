@@ -61,6 +61,7 @@ export const MESSAGES = {
   CART_ITEM_NOT_FOUND: "Cart item not found",
   CART_FETCHED: "Cart fetched successfully",
   CART_NOT_FOUND: "Cart not found",
+  CART_ITEM_NOTE_UPDATED:"Cart item note updated",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",

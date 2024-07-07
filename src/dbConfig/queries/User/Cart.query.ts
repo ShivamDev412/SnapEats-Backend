@@ -151,5 +151,20 @@ const removeFromCart = async (userId: string, cartItemId: string) => {
     throw new InternalServerError(error.message);
   }
 };
+const addNoteToItem = async (cartItemId:string, note:string) => {
+  try {
+    const updatedCartItem = await prisma.cartItem.update({
+      where: {
+        id: cartItemId,
+      },
+      data: {
+        note,
+      },
+    });
 
-export { addToCart, updateCartQuantity, removeFromCart, getCart };
+    return updatedCartItem;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
+export { addToCart, updateCartQuantity, removeFromCart, getCart, addNoteToItem };
