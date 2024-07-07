@@ -1,5 +1,6 @@
 import { MESSAGES, STATUS_CODE } from "../../utils/Constant";
 import {
+  addNoteToItem,
   addToCart,
   getCart,
   removeFromCart,
@@ -92,6 +93,18 @@ class CartController {
       await removeFromCart(userId, cartItemId);
       res.status(STATUS_CODE.OK).json({
         message: MESSAGES.ITEM_REMOVED_FROM_CART,
+        success: true,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  addNoteToItem = async (req: Request, res: Response, next: NextFunction) => {
+    const { cartItemId, note } = req.body;
+    try {
+      await addNoteToItem(cartItemId, note);
+      res.status(STATUS_CODE.OK).json({
+        message: MESSAGES.CART_ITEM_NOTE_UPDATED,
         success: true,
       });
     } catch (error) {
