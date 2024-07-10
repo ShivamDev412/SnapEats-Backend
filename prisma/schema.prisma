@@ -34,6 +34,7 @@ model User {
   facebookId               String?   @unique // For Social Login
   githubId                 String?   @unique // For Social Login
   stripeCustomerId         String?   @unique // Stripe Customer ID
+  paymentMethodId          String?   @unique // Stripe Payment Method ID
   reviews                  Review[] // One to Many relation
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt

@@ -124,7 +124,22 @@ const getUserById = async (id: string, password?: boolean) => {
     throw new InternalServerError(error.message);
   }
 };
-
+const getUserStripeCustomerId = async (id: string) => {
+  try {
+    return await prisma.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        stripeCustomerId: true,
+        email : true,
+        paymentMethodId: true,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
 const getUserRefreshToken = async (id: string) => {
   try {
     return await prisma.user.findUnique({
@@ -349,4 +364,5 @@ export {
   getUserByGoogleId,
   createUserWithSocialSingUp,
   getCartByUserId,
+  getUserStripeCustomerId,
 };
