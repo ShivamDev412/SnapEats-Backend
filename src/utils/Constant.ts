@@ -62,6 +62,11 @@ export const MESSAGES = {
   CART_FETCHED: "Cart fetched successfully",
   CART_NOT_FOUND: "Cart not found",
   CART_ITEM_NOTE_UPDATED:"Cart item note updated",
+  STORE_SUMMARY_FETCHED: "Store summary fetched",
+  PAYMENT_METHOD_ADDED: "Payment method added",
+  PAYMENT_METHOD_SET_AS_DEFAULT: "Payment method set as default",
+  PAYMENT_METHOD_REMOVED: "Payment method removed",
+  ORDER_PLACED: "Order placed successfully",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",

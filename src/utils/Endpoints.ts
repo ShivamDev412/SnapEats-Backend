@@ -44,6 +44,9 @@ const ENDPOINTS = {
   HOME_STORE_CATEGORY: "/home-store-category",
   HOME_STORE_MENU: "/home-store-menu",
   CART: "/cart",
+  CHECKOUT: "/checkout",
+  ORDER: "/order",
+  PAYMENTS: "/payments",
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",

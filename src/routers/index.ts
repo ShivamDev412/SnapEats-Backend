@@ -8,10 +8,12 @@ import adminAutRoute from "./Admin/Auth.route";
 import adminRoute from "./Admin/Admin.route";
 import cartRoute from "./User/Cart.route";
 import storeRoute from "./Store/Store.route";
+import checkoutRoute from "./User/Checkout.route";
 import storeMenuRoute from "./Store/Menu.route";
 import homeRoute from "./User/Home.route";
 import storeProfileRoute from "./Store/Profile.route";
 import { RESOURCE_PATH } from "../utils/Endpoints";
+import paymentRoutes from "../routers/User/Payments.route";
 const routes = express.Router();
 
 routes.use(RESOURCE_PATH.AUTH, authRoute);
@@ -21,7 +23,9 @@ routes.use(
   userAddressRoute,
   userProfileRoute,
   settingsRoute,
-  cartRoute
+  cartRoute,
+  checkoutRoute,
+  paymentRoutes
 );
 routes.use(RESOURCE_PATH.HOME, homeRoute);
 routes.use(RESOURCE_PATH.STORE, storeRoute, storeProfileRoute, storeMenuRoute);

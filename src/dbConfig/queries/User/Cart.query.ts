@@ -25,6 +25,39 @@ const getCart = async (userId: string) => {
     throw new InternalServerError(error.message);
   }
 };
+const getCartWithStore = async (userId: string) => {
+  try {
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      include: {
+        items: {
+          include: {
+            menuItem: {
+              include: {
+                store: {
+                  select:{
+                    id: true,
+                    name: true,
+                    deliveryFee: true,
+                  }
+                },
+              },
+            },
+            options: true,
+          },
+        },
+      },
+    });
+
+    if (!cart) {
+      throw new Error("Cart not found");
+    }
+
+    return cart.items
+  } catch (error: any) {
+    throw new Error(error.message);
+  }
+};
 
 const addToCart = async (
   userId: string,
@@ -167,4 +200,4 @@ const addNoteToItem = async (cartItemId:string, note:string) => {
     throw new InternalServerError(error.message);
   }
 };
-export { addToCart, updateCartQuantity, removeFromCart, getCart, addNoteToItem };
+export { addToCart, updateCartQuantity, removeFromCart, getCart, addNoteToItem, getCartWithStore };
