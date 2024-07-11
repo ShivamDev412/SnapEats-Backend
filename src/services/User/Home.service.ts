@@ -5,7 +5,7 @@ import {
   getStorePrimaryDetails,
 } from "../../dbConfig/queries/Store.query";
 import { getImage } from "../../utils/UploadToS3";
-import { DISTANCE_LIMIT, specialEventDates } from "../../utils/Constant";
+import { defaultCloseTime, defaultOpenTime, DISTANCE_LIMIT, specialEventDates } from "../../utils/Constant";
 import moment from "moment";
 import { InternalServerError, NotFoundError } from "../../utils/Error";
 import getTravelTime from "../../utils/TravelTime";
@@ -75,36 +75,40 @@ class HomeService {
         return {
           openTime: isSpecialEventDate(moment())
             ? store.specialEventOpenTime
-            : store.openTime,
+            : store.openTime !== null
+            ? store.openTime
+            : defaultOpenTime,
           closeTime: isSpecialEventDate(moment())
             ? store.specialEventCloseTime
-            : store.closeTime,
+            : store.closeTime !== null
+            ? store.closeTime
+            : defaultCloseTime,
           name: store.name,
           id: store.id,
           travelTime: store.travelTime,
           deliveryFee: store.deliveryFee,
           rating: store.rating,
-          image: await getImage(store.image as string),
-          compressedImage: await getImage(store.compressedImage as string),
+          image: store.image ? await getImage(store.image as string) : "",
+          compressedImage: store.compressedImage
+            ? await getImage(store.compressedImage as string)
+            : "",
         };
       })
     );
     return dataToSend;
   }
-  async getStorePrimaryDetails(
-    storeId: string,
-    lat: number,
-    lon: number
-  ) {
+  async getStorePrimaryDetails(storeId: string, lat: number, lon: number) {
     try {
       const store = await getStorePrimaryDetails(storeId);
       const { averagePrepTime } = await getStoreMenuItems(storeId);
 
       if (!store) throw new NotFoundError("Store not found");
-      const storeImage = await getImage(store?.image as string);
-      const storeCompressedImage = await getImage(
-        store?.compressedImage as string
-      );
+      const storeImage = store?.image
+        ? await getImage(store?.image as string)
+        : "";
+      const storeCompressedImage = store.compressedImage
+        ? await getImage(store?.compressedImage as string)
+        : "";
       const distance = calculateDistance(
         lat,
         lon,
@@ -124,17 +128,23 @@ class HomeService {
         deliveryFee: distance < 3 ? 0 : distance * 0.5,
         travelTime,
         openTime: isSpecialEventDate(moment())
-          ? store.specialEventOpenTime
-          : store.openTime,
-        closeTime: isSpecialEventDate(moment())
-          ? store.specialEventCloseTime
-          : store.closeTime,
+        ? store.specialEventOpenTime
+        : store.openTime !== null
+        ? store.openTime
+        : defaultOpenTime,
+      closeTime: isSpecialEventDate(moment())
+        ? store.specialEventCloseTime
+        : store.closeTime !== null
+        ? store.closeTime
+        : defaultCloseTime,
       };
     } catch (error: any) {
       throw new InternalServerError(error.message);
     }
   }
   async getStoreMenuItems(storeId: string, userId: string) {
+    console.log("storeId", storeId);
+    console.log("userId", userId);
     const cart = await getCartByUserId(userId);
     const { menuItems } = await getStoreMenuItems(storeId);
     const cartItemsMap: { [key: string]: number } =
