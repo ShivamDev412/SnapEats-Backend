@@ -37,7 +37,8 @@ class MenuController {
    */
   getCategories = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const categories = await this.menuService.getCategories();
+      const storeId = req.user?.storeId as string;
+      const categories = await this.menuService.getCategories(storeId);
       res.status(200).json({ data: categories, success: true });
     } catch (error: any) {
       next(error);

@@ -410,13 +410,16 @@ const getStoreEmailOtp = async (id: string) => {
   }
 };
 
-const getCategories = async () => {
+const getCategories = async (storeId: string) => {
   try {
     const categories = await prisma.category.findMany({
       select: {
         id: true,
         name: true,
         menuItems: {
+          where: {
+            storeId,
+          },
           select: {
             id: true,
           },

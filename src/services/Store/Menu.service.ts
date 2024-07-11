@@ -26,8 +26,8 @@ export type Option = {
   }[];
 };
 class MenuService {
-  async getCategories() {
-    const categories = (await getCategories()).map((category: any) => {
+  async getCategories(storeId: string) {
+    const categories = (await getCategories(storeId)).map((category: any) => {
       return {
         value: category.id,
         label: category.name,

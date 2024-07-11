@@ -130,3 +130,5 @@ export const specialEventDates = [
 export const DISTANCE_LIMIT = 20;
 export const AVERAGE_SPEED_MPH = 31;
 export const EXTRA_MINUTE = 5;
+export const defaultOpenTime = "2024-01-01T15:00:00Z";
+export const defaultCloseTime = "2024-01-01T03:00:00Z";
