@@ -83,6 +83,7 @@ model Store {
   specialEventOpenTime  DateTime?
   specialEventCloseTime DateTime?
   deliveryFee           Float?
+  stripeAccountId       String?          @unique // Stripe Account ID
   reviews               Review[] // One to Many relation
   status                StoreStatus      @default(PENDING)
   createdAt             DateTime         @default(now())

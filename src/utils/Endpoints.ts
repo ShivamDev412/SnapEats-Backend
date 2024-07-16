@@ -47,6 +47,7 @@ const ENDPOINTS = {
   CHECKOUT: "/checkout",
   ORDER: "/order",
   PAYMENTS: "/payments",
+  BANK_ACCOUNT  : "/bank-account",
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",

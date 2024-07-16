@@ -67,6 +67,10 @@ export const MESSAGES = {
   PAYMENT_METHOD_SET_AS_DEFAULT: "Payment method set as default",
   PAYMENT_METHOD_REMOVED: "Payment method removed",
   ORDER_PLACED: "Order placed successfully",
+  BANK_ACCOUNT_LINKED: "Bank account linked successfully",
+  BANK_ACCOUNT_FETCHED: "Bank account fetched successfully",
+  BANK_ACCOUNT_UNLINKED: "Bank account unlinked successfully",
+  NO_STRIPE_ACCOUNT_LINKED: "No Stripe account linked to this store"
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
@@ -130,5 +134,12 @@ export const specialEventDates = [
 export const DISTANCE_LIMIT = 20;
 export const AVERAGE_SPEED_MPH = 31;
 export const EXTRA_MINUTE = 5;
+export const MIN_TIME = 15;
 export const defaultOpenTime = "2024-01-01T15:00:00Z";
 export const defaultCloseTime = "2024-01-01T03:00:00Z";
+export const CURRENCY = {
+  CAD:"cad",
+};
+export const COUNTRY_CODE = {
+  CA:"ca",
+};

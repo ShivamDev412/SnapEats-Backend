@@ -20,5 +20,23 @@ class CheckoutController {
       next(error);
     }
   };
+  placeOrder = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userId = req.user?.id as string;
+      const { amount, orderItems } = req.body;
+      const order = await this.checkoutService.processOrder(
+        userId,
+        amount,
+        orderItems
+      );
+      res.status(STATUS_CODE.CREATED).json({
+        message: MESSAGES.ORDER_PLACED,
+        data: order,
+        success: true,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 export default CheckoutController;
