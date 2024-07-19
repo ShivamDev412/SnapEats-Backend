@@ -132,7 +132,7 @@ const getUserStripeCustomerId = async (id: string) => {
       },
       select: {
         stripeCustomerId: true,
-        email : true,
+        email: true,
         paymentMethodId: true,
       },
     });
@@ -346,6 +346,31 @@ const getCartByUserId = async (userId: string) => {
     throw new InternalServerError(error.message);
   }
 };
+const getTwoFactorSecret = async (userId: string) => {
+  try {
+    return await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        twoFactorAuthSecret: true,
+      },
+    });
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
+const getTwoFactorStatus = (userId: any) => {
+  return prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      twoFactorAuthEnabled: true,
+      twoFactorVerifiedAt: true,
+    }
+  })
+}
 export {
   createUser,
   getUserByEmail,
@@ -365,4 +390,6 @@ export {
   createUserWithSocialSingUp,
   getCartByUserId,
   getUserStripeCustomerId,
+  getTwoFactorSecret,
+  getTwoFactorStatus,
 };

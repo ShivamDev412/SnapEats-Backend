@@ -240,7 +240,6 @@ class AuthController {
           provider
         );
       if (userType === "existingUser") {
-        console.log(userType);
         const newRefreshTokenArray = cookies[REFRESH_COOKIE]
           ? user?.refreshTokens.filter(
               (rt: string) => rt !== cookies[REFRESH_COOKIE]

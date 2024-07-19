@@ -48,6 +48,10 @@ const ENDPOINTS = {
   ORDER: "/order",
   PAYMENTS: "/payments",
   BANK_ACCOUNT  : "/bank-account",
+  VERIFY_2FA: "/verify-2fa",
+  ENABLE_2FA: "/enable-2fa",
+  DISABLE_2FA: "/disable-2fa",
+  TWO_FA_STATUS: "/two-fa-status",
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",

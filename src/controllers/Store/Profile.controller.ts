@@ -197,7 +197,6 @@ class ProfileController {
   ) => {
     const { otp } = req.body;
     const storeId = req.user?.storeId;
-    console.log(storeId);
     try {
       const updatedStore = await this.profileService.verifyOTP(
         storeId as string,
@@ -601,7 +600,6 @@ class ProfileController {
     next: NextFunction
   ) => {
     const storeId = req.user?.storeId;
-    console.log(storeId);
     try {
       const foodTypes = await this.profileService.getStoreFoodTypes(
         storeId as string
@@ -635,7 +633,6 @@ class ProfileController {
     const storeId = req.user?.storeId;
     try {
       const storeTiming = await getStoreTime(storeId as string);
-      console.log(storeTiming);
       res.status(STATUS_CODE.OK).json({
         success: true,
         data: storeTiming,
