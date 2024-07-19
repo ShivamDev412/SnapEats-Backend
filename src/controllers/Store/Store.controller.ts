@@ -83,7 +83,6 @@ class SoreController {
         file,
         image
       );
-      console.log(store);
       res.status(STATUS_CODE.OK).json({
         message: MESSAGES.USER_PROFILE_UPDATED,
         data: store,

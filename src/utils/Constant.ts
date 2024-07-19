@@ -70,7 +70,11 @@ export const MESSAGES = {
   BANK_ACCOUNT_LINKED: "Bank account linked successfully",
   BANK_ACCOUNT_FETCHED: "Bank account fetched successfully",
   BANK_ACCOUNT_UNLINKED: "Bank account unlinked successfully",
-  NO_STRIPE_ACCOUNT_LINKED: "No Stripe account linked to this store"
+  NO_STRIPE_ACCOUNT_LINKED: "No Stripe account linked to this store",
+  INVALID_2FA_TOKEN: "Invalid 2FA token",
+  ENABLE_2FA: "2FA enabled successfully",
+  DISABLE_2FA: "2FA disabled successfully",
+  VERIFY_2FA_EXPIRED: "Verification time expired",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",

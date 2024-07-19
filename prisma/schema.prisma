@@ -40,7 +40,10 @@ model User {
   updatedAt                DateTime  @updatedAt
   passwordResetToken       String? // Token for password reset
   passwordResetTokenExpiry DateTime? // Token expiry date
+  twoFactorAuthEnabled     Boolean   @default(false)
+  twoFactorAuthSecret      String?
   language                 String?   @default("en")
+  twoFactorVerifiedAt   DateTime? 
 }
 
 model Address {

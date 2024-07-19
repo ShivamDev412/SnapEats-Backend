@@ -4,7 +4,6 @@ const prisma = new PrismaClient();
 // import prisma from "../dbConfig/index";
 const getUsers = async () => {
   const users = await prisma.user.findMany();
-  console.log(users);
 };
 const removeRefreshToken = async () => {
   const updatedUser =  await prisma.user.update({

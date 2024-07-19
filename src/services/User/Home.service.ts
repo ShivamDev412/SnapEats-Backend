@@ -143,8 +143,7 @@ class HomeService {
     }
   }
   async getStoreMenuItems(storeId: string, userId: string) {
-    console.log("storeId", storeId);
-    console.log("userId", userId);
+
     const cart = await getCartByUserId(userId);
     const { menuItems } = await getStoreMenuItems(storeId);
     const cartItemsMap: { [key: string]: number } =

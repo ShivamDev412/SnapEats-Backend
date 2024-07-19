@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { MESSAGES } from "../utils/Constant";
 import { AuthError, ForbiddenError } from "../utils/Error";
+import prisma from "../dbConfig";
 
 export type AuthPayload = {
   id: string;
@@ -15,11 +16,12 @@ declare global {
     interface Request {
       user?: User;
       file?: Express.Multer.File;
+      twoFAToken?: string;
     }
   }
 }
 
-export const AuthMiddleware = (
+export const AuthMiddleware = async (
   request: Request,
   response: Response,
   next: NextFunction
@@ -32,7 +34,7 @@ export const AuthMiddleware = (
 
   const token = authHeader?.toString().split(" ")[1];
 
-  jwt.verify(token, process.env.JWT_SECRET!, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET!, async (err, decoded) => {
     if (err) {
       return next(new ForbiddenError(MESSAGES.TOKEN_EXPIRED));
     } else {

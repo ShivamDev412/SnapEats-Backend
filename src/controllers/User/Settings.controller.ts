@@ -115,7 +115,6 @@ class SettingsController {
         newPassword,
         userId
       );
-      console.log(updatedUser, "updatedUser");
       if (updatedUser)
         res.status(200).json({
           message: MESSAGES.PASSWORD_UPDATED,

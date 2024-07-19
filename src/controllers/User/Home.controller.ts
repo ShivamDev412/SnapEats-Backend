@@ -43,7 +43,6 @@ class HomeController {
         lat,
         lon
       );
-      console.log(store);
       return res.status(200).json({
         data: store,
         message: "Store details fetched successfully",

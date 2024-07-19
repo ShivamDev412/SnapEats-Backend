@@ -15,9 +15,7 @@ const io = new Server(server, {
 
 // io.use(socketAuthMiddleware);
 io.on(SOCKET_EVENT.CONNECTION, (socket) => {
-  console.log("NEW CLIENT CONNECTED " + socket.id);
   socket.on(SOCKET_EVENT.DISCONNECT, () => {
-    console.log("CLIENT DISCONNECTED " + socket.id);
   });
 });
 export { io, server, app};
