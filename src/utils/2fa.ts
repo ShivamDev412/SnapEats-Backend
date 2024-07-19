@@ -1,4 +1,5 @@
 import speakeasy from 'speakeasy';
+// @ts-ignore
 import QRCode from 'qrcode';
 
 export const generate2FASecret = () => {
