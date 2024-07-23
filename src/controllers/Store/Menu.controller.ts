@@ -3,7 +3,7 @@ import MenuService from "../../services/Store/Menu.service";
 import { deleteMenuItemById } from "../../dbConfig/queries/Store.query";
 
 class MenuController {
-  menuService: MenuService;
+  private menuService: MenuService;
   constructor() {
     this.menuService = new MenuService();
   }

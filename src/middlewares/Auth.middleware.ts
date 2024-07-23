@@ -3,6 +3,14 @@ import jwt from "jsonwebtoken";
 import { MESSAGES } from "../utils/Constant";
 import { AuthError, ForbiddenError } from "../utils/Error";
 import prisma from "../dbConfig";
+import { ENDPOINTS } from "../utils/Endpoints";
+
+declare module "express-session" {
+  interface Session {
+    challenge?: string;
+    deviceId?: string;
+  }
+}
 
 export type AuthPayload = {
   id: string;

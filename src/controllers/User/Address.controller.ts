@@ -7,7 +7,7 @@ import {
 import { Address } from "@prisma/client";
 import AddressService from "../../services/User/Address.service";
 class AddressController {
-  addressService: AddressService;
+  private addressService: AddressService;
   constructor() {
     this.addressService = new AddressService();
   }

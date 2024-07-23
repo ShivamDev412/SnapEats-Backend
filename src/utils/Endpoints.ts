@@ -33,8 +33,8 @@ const ENDPOINTS = {
   CHOICE: "/choice",
   MENU: "/menu",
   PROFILE: "/profile",
-  CHANGE_LANGUAGE:"/change-language",
-  CHANGE_PASSWORD:"/change-password",
+  CHANGE_LANGUAGE: "/change-language",
+  CHANGE_PASSWORD: "/change-password",
   FOOD_TYPE: "/food-type",
   STORE_FOOD_TYPE: "/store-food-type",
   GOOGLE_AUTH_CALLBACK: "/google/callback",
@@ -47,17 +47,19 @@ const ENDPOINTS = {
   CHECKOUT: "/checkout",
   ORDER: "/order",
   PAYMENTS: "/payments",
-  BANK_ACCOUNT  : "/bank-account",
+  BANK_ACCOUNT: "/bank-account",
   VERIFY_2FA: "/verify-2fa",
   ENABLE_2FA: "/enable-2fa",
   DISABLE_2FA: "/disable-2fa",
   TWO_FA_STATUS: "/two-fa-status",
+  PLACE_ORDER: "/place-order",
+  ACCEPT_ORDER: "/accept-order",
+  CANCEL_ORDER: "/cancel-order",
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",
   REJECT_STORE_REQUEST: "/reject-store-request",
   HOME: "/home",
- 
 };
 
 export { ENDPOINTS, BASE_PATH, RESOURCE_PATH };

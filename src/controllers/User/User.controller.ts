@@ -14,7 +14,7 @@ import {
 import { clearCookie } from "../../utils/HandleCookies";
 
 class UserController {
-  userService: UserService;
+  private userService: UserService;
   constructor() {
     this.userService = new UserService();
   }

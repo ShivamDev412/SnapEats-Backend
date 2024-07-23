@@ -10,7 +10,7 @@ import dotenv from "dotenv";
 dotenv.config();
 //
 class AuthController {
-  authService: AuthService;
+  private authService: AuthService;
   constructor() {
     this.authService = new AuthService();
   }
