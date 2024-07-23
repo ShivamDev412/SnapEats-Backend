@@ -1,9 +1,10 @@
-import Stripe from "stripe";
 import { getCartWithStore } from "../../dbConfig/queries/User/Cart.query";
 import { getUserStripeCustomerId } from "../../dbConfig/queries/User.query";
 import { InternalServerError } from "../../utils/Error";
-import { CURRENCY, MESSAGES } from "../../utils/Constant";
+import { MESSAGES, SOCKET_EVENT } from "../../utils/Constant";
 import { createOrder } from "../../dbConfig/queries/User/Order.query";
+import { io } from "../../utils/SocketInstance";
+
 export type OrderSummaryItem = {
   id: string;
   name: string;
@@ -21,11 +22,11 @@ export type OrderSummaryItem = {
 type StoreSummary = {
   storeId: string;
   storeName: string;
+  stripeAccountId: string;
   deliveryFee: number;
   items: OrderSummaryItem[];
   subtotal: number;
 };
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 class CheckoutService {
   async getOrderSummary(userId: string) {
     const cartItems = await getCartWithStore(userId);
@@ -34,6 +35,7 @@ class CheckoutService {
       if (!summary[store.id]) {
         summary[store.id] = {
           storeId: store.id,
+          stripeAccountId: store.stripeAccountId || "",
           storeName: store.name,
           deliveryFee: store.deliveryFee || 0,
           items: [],
@@ -66,29 +68,11 @@ class CheckoutService {
     const orderSummary = Object.values(storeSummary);
     return orderSummary;
   }
-  async processOrder(
-    userId: string,
-    amount: number,
-    orderItems: StoreSummary[]
-  ) {
+  async placeOrder(userId: string, orderItems: StoreSummary[]) {
     const user = await getUserStripeCustomerId(userId);
     if (!user) {
       throw new InternalServerError(MESSAGES.USER_NOT_FOUND);
     }
-
-    // Make Payment
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: CURRENCY.CAD,
-      customer: user.stripeCustomerId as string,
-      payment_method: user.paymentMethodId as string,
-      metadata: {
-        userId,
-        orderItems: JSON.stringify(orderItems),
-      },
-    });
-
-    // Iterate over the orderItems to create an order for each store
     const storeOrderPromises = orderItems.map(async (store) => {
       const storeId = store.storeId;
       const storeOrder = await createOrder(
@@ -97,15 +81,12 @@ class CheckoutService {
         storeId,
         store.items
       );
+      io.emit(SOCKET_EVENT.NEW_ORDER, storeOrder);
+
       return storeOrder;
     });
 
     const orders = await Promise.all(storeOrderPromises);
-
-    // Clear Cart
-
-    // Notify Store about order
-    // Notify User that order has been placed
 
     return orders;
   }

@@ -75,6 +75,12 @@ export const MESSAGES = {
   ENABLE_2FA: "2FA enabled successfully",
   DISABLE_2FA: "2FA disabled successfully",
   VERIFY_2FA_EXPIRED: "Verification time expired",
+  INVALID_BIOMETRIC_SESSION: "Invalid biometric session",
+  BIOMETRIC_NOT_FOUND: "Biometric record not found",
+  PAYMENT_METHOD_NOT_SET: "Payment method not set",
+  ORDER_NOT_FOUND: "Order not found",
+  PAYMENT_PROCESSED: "Payment processed successfully",
+  ORDER_CANCELLED: "Order cancelled successfully",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
@@ -110,6 +116,8 @@ export const SOCKET_EVENT = {
   NEW_STORE_REQUEST: "new_store_requests",
   DISCONNECT: "disconnect",
   CONNECTION: "connection",
+  NEW_ORDER: "new_order",
+  ORDER_STATUS: "order_status",
 }
 export const ADMIN_REFRESH_COOKIE = "snapEats-admin-refresh-token";
 export const REFRESH_COOKIE = "snapEats-refresh-token";

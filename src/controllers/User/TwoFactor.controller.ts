@@ -3,7 +3,7 @@ import { MESSAGES, STATUS_CODE } from "../../utils/Constant";
 import TwoFAService from "../../services/User/TwoFA.service";
 
 class TwoFactorAuth {
-  twoFAService: TwoFAService;
+  private twoFAService: TwoFAService;
   constructor() {
     this.twoFAService = new TwoFAService();
   }

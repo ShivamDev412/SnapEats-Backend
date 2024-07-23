@@ -43,7 +43,7 @@ model User {
   twoFactorAuthEnabled     Boolean   @default(false)
   twoFactorAuthSecret      String?
   language                 String?   @default("en")
-  twoFactorVerifiedAt   DateTime? 
+  twoFactorVerifiedAt      DateTime?
 }
 
 model Address {

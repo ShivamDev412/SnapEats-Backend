@@ -7,7 +7,7 @@ import { StoreProfileSchema } from "../../Schemas/StoreProfile.schema";
 import { getImage } from "../../utils/UploadToS3";
 
 class SoreController {
-  storeService: StoreService;
+  private storeService: StoreService;
   constructor() {
     this.storeService = new StoreService();
   }

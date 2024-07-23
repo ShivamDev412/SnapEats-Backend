@@ -4,7 +4,7 @@ import SettingsService from "../../services/User/Settings.service";
 import { ChangePasswordSchema } from "../../Schemas/UserProfile.schema";
 
 class SettingsController {
-  settingsService: SettingsService;
+  private settingsService: SettingsService;
   constructor() {
     this.settingsService = new SettingsService();
   }

@@ -10,4 +10,9 @@ routes.get(
   AuthMiddleware,
   checkoutController.getOrderSummary
 );
+routes.post(
+  ENDPOINTS.PLACE_ORDER,
+  AuthMiddleware,
+  checkoutController.placeOrder
+);
 export default routes;

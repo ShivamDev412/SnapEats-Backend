@@ -8,7 +8,7 @@ type GetStoreQuery = {
   foodTypeId: string;
 };
 class HomeController {
-  homeService: HomeService;
+  private homeService: HomeService;
   constructor() {
     this.homeService = new HomeService();
   }

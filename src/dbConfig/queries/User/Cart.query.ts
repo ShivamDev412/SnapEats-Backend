@@ -39,6 +39,7 @@ const getCartWithStore = async (userId: string) => {
                     id: true,
                     name: true,
                     deliveryFee: true,
+                    stripeAccountId: true,
                   }
                 },
               },
@@ -200,4 +201,19 @@ const addNoteToItem = async (cartItemId:string, note:string) => {
     throw new InternalServerError(error.message);
   }
 };
-export { addToCart, updateCartQuantity, removeFromCart, getCart, addNoteToItem, getCartWithStore };
+const clearCart = async (userId: string) => {
+  try {
+    const deletedCartItems = await prisma.cartItem.deleteMany({
+      where: {
+        cart: {
+          userId: userId,
+        },
+      },
+    });
+
+    return deletedCartItems;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
+export { addToCart, updateCartQuantity, removeFromCart, getCart, addNoteToItem, getCartWithStore, clearCart };

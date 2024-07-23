@@ -2,7 +2,7 @@ import { MESSAGES } from "../../utils/Constant";
 import PaymentService from "../../services/Store/Payment.service";
 import { Request, Response, NextFunction } from "express";
 class PaymentController {
-  paymentService: PaymentService;
+  private paymentService: PaymentService;
   constructor() {
     this.paymentService = new PaymentService();
   }
