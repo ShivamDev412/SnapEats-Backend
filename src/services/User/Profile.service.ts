@@ -5,7 +5,7 @@ import {
   getUserEmailOtp,
   getUserPhoneOtp,
   updateUser,
-} from "../../dbConfig/queries/User.query";
+} from "../../dbConfig/queries/User/User.query";
 import { MESSAGES } from "../../utils/Constant";
 import { getImage } from "../../utils/UploadToS3";
 

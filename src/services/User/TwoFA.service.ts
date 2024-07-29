@@ -1,8 +1,9 @@
 import {
   getTwoFactorSecret,
   getTwoFactorStatus,
-  updateUser,
-} from "../../dbConfig/queries/User.query";
+
+} from "../../dbConfig/queries/User/Settings.query";
+import { updateUser } from "../../dbConfig/queries/User/User.query";
 import { generate2FASecret, getQRCode, verify2FAToken } from "../../utils/2fa";
 
 class TwoFAService {

@@ -5,7 +5,7 @@ import {
   getUserById,
   getUserForgotPassword,
   updateUser,
-} from "../../dbConfig/queries/User.query";
+} from "../../dbConfig/queries/User/User.query";
 import { MESSAGES, SALT_ROUNDS } from "../../utils/Constant";
 import {
   deleteImageFromS3,

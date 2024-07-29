@@ -7,8 +7,8 @@ import {
   getStoreByUserId,
   removeStoreById,
   updateStoreById,
-} from "../../dbConfig/queries/Store.query";
-import { getUserById } from "../../dbConfig/queries/User.query";
+} from "../../dbConfig/queries/Store/Store.query";
+import { getUserById } from "../../dbConfig/queries/User/User.query";
 import { sendToMail } from "../../utils/NodeMailer";
 import { InternalServerError } from "../../utils/Error";
 import { EMAIL_SUBJECT, MESSAGES } from "../../utils/Constant";

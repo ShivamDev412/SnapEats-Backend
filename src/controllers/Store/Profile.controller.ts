@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { MESSAGES, STATUS_CODE } from "../../utils/Constant";
 import ProfileService from "../../services/Store/Profile.service";
-import { getStoreTime } from "../../dbConfig/queries/Store.query";
+import { getStoreTime } from "../../dbConfig/queries/Store/Store.query";
 
 class ProfileController {
   private profileService: ProfileService;

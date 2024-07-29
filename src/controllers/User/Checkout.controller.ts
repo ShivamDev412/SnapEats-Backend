@@ -13,6 +13,7 @@ class CheckoutController {
     try {
       const userId = req.user?.id as string;
       const orderSummary = await this.checkoutService.getOrderSummary(userId);
+    
       res.status(STATUS_CODE.OK).json({
         message: MESSAGES.STORE_SUMMARY_FETCHED,
         data: orderSummary,
@@ -26,7 +27,7 @@ class CheckoutController {
   placeOrder = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = req.user?.id as string;
-      const { orderItems } = req.body;
+      const orderItems = req.body;
       const order = await this.checkoutService.placeOrder(userId, orderItems);
       res.status(STATUS_CODE.CREATED).json({
         message: MESSAGES.ORDER_PLACED,

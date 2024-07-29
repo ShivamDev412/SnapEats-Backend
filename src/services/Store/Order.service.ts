@@ -1,14 +1,46 @@
 import Stripe from "stripe";
 import { InternalServerError } from "../../utils/Error";
+import { getOrderById } from "../../dbConfig/queries/User/Order.query";
 import {
   acceptOrder,
   cancelOrder,
-  getOrderById,
-} from "../../dbConfig/queries/User/Order.query";
+  getOrdersByStoreId,
+} from "../../dbConfig/queries/Store/Order.query";
 import { CURRENCY, MESSAGES, SOCKET_EVENT } from "../../utils/Constant";
-import { io } from "../../utils/SocketInstance";
+import { io } from "../../index";
+import { getImage } from "../../utils/UploadToS3";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 class OrderService {
+  async getOrder(storeId: string, page: number) {
+    const { orders, totalCount } = await getOrdersByStoreId(storeId, page);
+    const ordersToSend = await Promise.all(
+      orders.map(async (order) => {
+        const itemsWithImages = await Promise.all(
+          order.items.map(async (item) => {
+            const image = await getImage(item.menuItem.image as string);
+            const compressedImage = await getImage(
+              item.menuItem.compressedImage as string
+            );
+            return {
+              ...item,
+              menuItem: {
+                image,
+                compressedImage,
+              },
+            };
+          })
+        );
+        return {
+          ...order,
+          items: itemsWithImages,
+        };
+      })
+    );
+    return {
+      orders: ordersToSend,
+      totalCount,
+    };
+  }
   async acceptOrder(orderId: string) {
     const order = await getOrderById(orderId);
 

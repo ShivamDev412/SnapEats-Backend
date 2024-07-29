@@ -5,12 +5,12 @@ import {
   getStoreById,
   getStoreByPhoneNumber,
   updateStoreById,
-} from "../../dbConfig/queries/Store.query";
+} from "../../dbConfig/queries/Store/Store.query";
 import { MESSAGES, SOCKET_EVENT } from "../../utils/Constant";
 import { StoreAccountRequestTemplate } from "../../utils/EmailTemplates";
 import { sendToMail } from "../../utils/NodeMailer";
-import { getUserById } from "../../dbConfig/queries/User.query";
-import { io } from "../../utils/SocketInstance";
+import { getUserById } from "../../dbConfig/queries/User/User.query";
+import { io } from "../../index";
 import {
   deleteImageFromS3,
   getImage,

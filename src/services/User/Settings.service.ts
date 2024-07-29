@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { getUserById, updateUser } from "../../dbConfig/queries/User.query";
+import { getUserById, updateUser } from "../../dbConfig/queries/User/User.query";
 import { AuthError, NotFoundError } from "../../utils/Error";
 import { MESSAGES, SALT_ROUNDS } from "../../utils/Constant";
 

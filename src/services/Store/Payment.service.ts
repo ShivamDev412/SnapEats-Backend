@@ -2,7 +2,7 @@ import { InternalServerError } from "../../utils/Error";
 import prisma from "../../dbConfig";
 import { COUNTRY_CODE, CURRENCY, MESSAGES } from "../../utils/Constant";
 import Stripe from "stripe";
-import { updateStoreById } from "../../dbConfig/queries/Store.query";
+import { updateStoreById } from "../../dbConfig/queries/Store/Store.query";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 class PaymentService {

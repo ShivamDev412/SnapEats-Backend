@@ -1,5 +1,5 @@
 import { InternalServerError } from "../../utils/Error";
-import { getUserStripeCustomerId } from "../../dbConfig/queries/User.query";
+import { getUserStripeCustomerId } from "../../dbConfig/queries/User/User.query";
 import Stripe from "stripe";
 import { MESSAGES } from "../../utils/Constant";
 import prisma from "../../dbConfig";

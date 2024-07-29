@@ -6,11 +6,13 @@ import {
   updateStoreById,
   getPhoneNumberOTP,
   getStoreEmailOtp,
+} from "../../dbConfig/queries/Store/Store.query";
+import {
   getFoodTypes,
   addFoodTypeToStore,
   removeFoodTypeFromStore,
   getFoodTypesForStore,
-} from "../../dbConfig/queries/Store.query";
+} from "../../dbConfig/queries/Store/Menu.query";
 import { MESSAGES } from "../../utils/Constant";
 import { getImage } from "../../utils/UploadToS3";
 

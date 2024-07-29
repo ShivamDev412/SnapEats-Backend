@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import MenuService from "../../services/Store/Menu.service";
-import { deleteMenuItemById } from "../../dbConfig/queries/Store.query";
+import { deleteMenuItemById } from "../../dbConfig/queries/Store/Menu.query";
 
 class MenuController {
   private menuService: MenuService;

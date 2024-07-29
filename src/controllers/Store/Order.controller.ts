@@ -32,5 +32,22 @@ class OrderController {
       next(error);
     }
   };
+  getOrder = async (req: Request, res: Response, next: NextFunction) => {
+    const { page } = req.query as { page: string };
+    try {
+      const storeId = req.params.storeId;
+      const {orders, totalCount} = await this.orderService.getOrder(storeId, +page);
+      res.status(200).json({
+        success: true,
+        data: {
+          orders,
+          totalCount,
+          page: +page,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 export default OrderController;

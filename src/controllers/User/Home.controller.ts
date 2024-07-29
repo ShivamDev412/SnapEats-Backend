@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import HomeService from "../../services/User/Home.service";
-import { getStoreMenuCategories } from "../../dbConfig/queries/Store.query";
+import { getStoreMenuCategories } from "../../dbConfig/queries/Store/Menu.query";
 type GetStoreQuery = {
   lat: number;
   lon: number;
