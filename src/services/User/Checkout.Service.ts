@@ -1,9 +1,12 @@
-import { getCartWithStore } from "../../dbConfig/queries/User/Cart.query";
-import { getUserStripeCustomerId } from "../../dbConfig/queries/User.query";
+import { clearCart, getCartWithStore } from "../../dbConfig/queries/User/Cart.query";
+import { getUserStripeCustomerId } from "../../dbConfig/queries/User/User.query";
 import { InternalServerError } from "../../utils/Error";
-import { MESSAGES, SOCKET_EVENT } from "../../utils/Constant";
-import { createOrder } from "../../dbConfig/queries/User/Order.query";
-import { io } from "../../utils/SocketInstance";
+import { MESSAGES, SOCKET_EVENT, TAX } from "../../utils/Constant";
+import {
+  createOrder,
+  getOrderDetailById,
+} from "../../dbConfig/queries/User/Order.query";
+import { io } from "../../index";
 
 export type OrderSummaryItem = {
   id: string;
@@ -17,6 +20,8 @@ export type OrderSummaryItem = {
     additionalPrice?: number;
   }[];
   totalPrice: number;
+  gst: number;
+  pst: number;
 };
 
 type StoreSummary = {
@@ -26,10 +31,14 @@ type StoreSummary = {
   deliveryFee: number;
   items: OrderSummaryItem[];
   subtotal: number;
+  gst: number;
+  pst: number;
+  totalWithTax: number;
 };
 class CheckoutService {
   async getOrderSummary(userId: string) {
     const cartItems = await getCartWithStore(userId);
+    const calculateTax = (amount: number, rate: number) => amount * rate;
     const storeSummary = cartItems.reduce((summary, item) => {
       const { store } = item.menuItem;
       if (!summary[store.id]) {
@@ -40,6 +49,9 @@ class CheckoutService {
           deliveryFee: store.deliveryFee || 0,
           items: [],
           subtotal: 0,
+          gst: 0,
+          pst: 0,
+          totalWithTax: 0,
         };
       }
       const itemTotalPrice =
@@ -50,7 +62,7 @@ class CheckoutService {
           )) *
         item.quantity;
       summary[store.id].items.push({
-        id: item.id,
+        id: item.menuItemId,
         name: item.name,
         quantity: item.quantity,
         price: item.price,
@@ -61,12 +73,36 @@ class CheckoutService {
           additionalPrice: option.additionalPrice || 0,
         })),
         totalPrice: itemTotalPrice,
+        gst: 0,
+        pst: 0,
       });
       summary[store.id].subtotal += itemTotalPrice;
       return summary;
     }, {} as { [key: string]: StoreSummary });
-    const orderSummary = Object.values(storeSummary);
-    return orderSummary;
+
+    const orderSummary = Object.values(storeSummary).map((store) => {
+      return {
+        ...store,
+        gst: calculateTax(store.subtotal, TAX.GST_RATE),
+        pst: calculateTax(store.subtotal, TAX.PST_RATE),
+        totalWithTax:
+          calculateTax(store.subtotal, TAX.GST_RATE) +
+          calculateTax(store.subtotal, TAX.PST_RATE) +
+          store.subtotal +
+          store.deliveryFee,
+      };
+    });
+    const grandTotal =
+      orderSummary.reduce((total, store) => {
+        return total + store.totalWithTax;
+      }, 0) || 0;
+  
+    return {
+      orderSummary,
+      grandTotal,
+      gstRate: TAX.GST_RATE,
+      pstRate: TAX.PST_RATE,
+    };
   }
   async placeOrder(userId: string, orderItems: StoreSummary[]) {
     const user = await getUserStripeCustomerId(userId);
@@ -75,13 +111,18 @@ class CheckoutService {
     }
     const storeOrderPromises = orderItems.map(async (store) => {
       const storeId = store.storeId;
+
       const storeOrder = await createOrder(
         userId,
-        store.subtotal + store.deliveryFee,
+        store.totalWithTax,
         storeId,
         store.items
       );
-      io.emit(SOCKET_EVENT.NEW_ORDER, storeOrder);
+      const orderToSend = await getOrderDetailById(storeOrder.id);
+      await clearCart(userId)
+      io.emit(SOCKET_EVENT.NEW_ORDER, orderToSend, () => {
+        console.log("Order emitted");
+      });
 
       return storeOrder;
     });

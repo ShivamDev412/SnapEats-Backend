@@ -81,6 +81,7 @@ export const MESSAGES = {
   ORDER_NOT_FOUND: "Order not found",
   PAYMENT_PROCESSED: "Payment processed successfully",
   ORDER_CANCELLED: "Order cancelled successfully",
+  ORDER_FETCHED: "Order fetched successfully",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
@@ -152,6 +153,10 @@ export const defaultCloseTime = "2024-01-01T03:00:00Z";
 export const CURRENCY = {
   CAD:"cad",
 };
+export const TAX = {
+  GST_RATE:0.05,
+  PST_RATE:0.07
+}
 export const COUNTRY_CODE = {
   CA:"ca",
 };

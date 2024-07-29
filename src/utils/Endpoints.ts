@@ -55,6 +55,7 @@ const ENDPOINTS = {
   PLACE_ORDER: "/place-order",
   ACCEPT_ORDER: "/accept-order",
   CANCEL_ORDER: "/cancel-order",
+  STORE_ORDERS: "/store-orders",
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",

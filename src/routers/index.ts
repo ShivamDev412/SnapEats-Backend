@@ -1,4 +1,5 @@
 import express from "express";
+import { RESOURCE_PATH } from "../utils/Endpoints";
 import authRoute from "./User/Auth.route";
 import userRoute from "./User/User.route";
 import userAddressRoute from "./User/Address.route";
@@ -14,9 +15,9 @@ import homeRoute from "./User/Home.route";
 import storeProfileRoute from "./Store/Profile.route";
 import storePaymentRoute from "./Store/Payment.route";
 import twoFaRoute from "./User/TwoFactor.route";
-import { RESOURCE_PATH } from "../utils/Endpoints";
 import paymentRoutes from "../routers/User/Payments.route";
 import storeOrderRoutes from "../routers/Store/Order.route";
+import orderRoutes from "../routers/User/Order.route";
 const routes = express.Router();
 
 routes.use(RESOURCE_PATH.AUTH, authRoute);
@@ -29,7 +30,8 @@ routes.use(
   cartRoute,
   checkoutRoute,
   paymentRoutes,
-  twoFaRoute
+  twoFaRoute,
+  orderRoutes
 );
 routes.use(RESOURCE_PATH.HOME, homeRoute);
 routes.use(

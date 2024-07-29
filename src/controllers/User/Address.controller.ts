@@ -3,7 +3,7 @@ import { MESSAGES, STATUS_CODE } from "../../utils/Constant";
 import {
   deleteAddress,
   getUserAddressById,
-} from "../../dbConfig/queries/User.query";
+} from "../../dbConfig/queries/User/Address.query";
 import { Address } from "@prisma/client";
 import AddressService from "../../services/User/Address.service";
 class AddressController {

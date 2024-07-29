@@ -6,12 +6,12 @@ import {
   getUserByEmail,
   getUserById,
   updateUser,
-} from "../../dbConfig/queries/User.query";
+} from "../../dbConfig/queries/User/User.query";
 import { MESSAGES, SALT_ROUNDS } from "../../utils/Constant";
 import { createAuthToken, createRefreshToken } from "../../utils/GenerateToken";
 import { AuthError, ForbiddenError, NotFoundError } from "../../utils/Error";
 import prisma from "../../dbConfig";
-import { getStoreByUserId } from "../../dbConfig/queries/Store.query";
+import { getStoreByUserId } from "../../dbConfig/queries/Store/Store.query";
 
 class AuthService {
   async loginUser(email: string, password: string) {

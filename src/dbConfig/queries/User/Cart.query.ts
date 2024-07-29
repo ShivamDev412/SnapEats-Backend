@@ -1,7 +1,24 @@
 import { InternalServerError } from "../../../utils/Error";
 import prisma from "../../../dbConfig";
 import { MESSAGES } from "../../../utils/Constant";
-
+const getCartByUserId = async (userId: string) => {
+  try {
+    const cart = await prisma.cart.findUnique({
+      where: { userId },
+      select: {
+        items: {
+          select: {
+            menuItemId: true,
+            quantity: true,
+          },
+        },
+      },
+    });
+    return cart;
+  } catch (error: any) {
+    throw new InternalServerError(error.message);
+  }
+};
 const getCart = async (userId: string) => {
   try {
     const cart = await prisma.cart.findUnique({
@@ -14,7 +31,7 @@ const getCart = async (userId: string) => {
             options: true,
           },
           orderBy: {
-            createdAt: 'desc', 
+            createdAt: "desc",
           },
         },
       },
@@ -35,12 +52,12 @@ const getCartWithStore = async (userId: string) => {
             menuItem: {
               include: {
                 store: {
-                  select:{
+                  select: {
                     id: true,
                     name: true,
                     deliveryFee: true,
                     stripeAccountId: true,
-                  }
+                  },
                 },
               },
             },
@@ -54,7 +71,7 @@ const getCartWithStore = async (userId: string) => {
       throw new Error("Cart not found");
     }
 
-    return cart.items
+    return cart.items;
   } catch (error: any) {
     throw new Error(error.message);
   }
@@ -159,7 +176,7 @@ const updateCartQuantity = async (
         quantity,
       },
     });
-    
+
     return updatedCartItem;
   } catch (error: any) {
     throw new InternalServerError(error.message);
@@ -185,7 +202,7 @@ const removeFromCart = async (userId: string, cartItemId: string) => {
     throw new InternalServerError(error.message);
   }
 };
-const addNoteToItem = async (cartItemId:string, note:string) => {
+const addNoteToItem = async (cartItemId: string, note: string) => {
   try {
     const updatedCartItem = await prisma.cartItem.update({
       where: {
@@ -203,17 +220,37 @@ const addNoteToItem = async (cartItemId:string, note:string) => {
 };
 const clearCart = async (userId: string) => {
   try {
-    const deletedCartItems = await prisma.cartItem.deleteMany({
-      where: {
-        cart: {
-          userId: userId,
+    await prisma.$transaction(async (prisma) => {
+      await prisma.cartItemOption.deleteMany({
+        where: {
+          cartItem: {
+            cart: {
+              userId: userId,
+            },
+          },
         },
-      },
-    });
+      });
+      const deletedCartItems = await prisma.cartItem.deleteMany({
+        where: {
+          cart: {
+            userId: userId,
+          },
+        },
+      });
 
-    return deletedCartItems;
+      return deletedCartItems;
+    });
   } catch (error: any) {
     throw new InternalServerError(error.message);
   }
 };
-export { addToCart, updateCartQuantity, removeFromCart, getCart, addNoteToItem, getCartWithStore, clearCart };
+export {
+  addToCart,
+  updateCartQuantity,
+  removeFromCart,
+  getCart,
+  addNoteToItem,
+  getCartWithStore,
+  clearCart,
+  getCartByUserId,
+};

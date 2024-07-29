@@ -6,9 +6,9 @@ import {
   getMenuItemById,
   getMenuItemsByStoreId,
   getOptions,
-  getStoreById,
   updateMenuItem,
-} from "../../dbConfig/queries/Store.query";
+} from "../../dbConfig/queries/Store/Menu.query";
+import { getStoreById } from "../../dbConfig/queries/Store/Store.query";
 import { MESSAGES } from "../../utils/Constant";
 import {
   deleteImageFromS3,

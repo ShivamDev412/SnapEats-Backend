@@ -1,15 +1,20 @@
 import calculateDistance from "../../utils/GetDistance";
 import {
   getAllStores,
-  getStoreMenuItems,
   getStorePrimaryDetails,
-} from "../../dbConfig/queries/Store.query";
+} from "../../dbConfig/queries/Store/Store.query";
+import { getStoreMenuItems } from "../../dbConfig/queries/Store/Menu.query";
 import { getImage } from "../../utils/UploadToS3";
-import { defaultCloseTime, defaultOpenTime, DISTANCE_LIMIT, specialEventDates } from "../../utils/Constant";
+import {
+  defaultCloseTime,
+  defaultOpenTime,
+  DISTANCE_LIMIT,
+  specialEventDates,
+} from "../../utils/Constant";
 import moment from "moment";
 import { InternalServerError, NotFoundError } from "../../utils/Error";
 import getTravelTime from "../../utils/TravelTime";
-import { getCartByUserId } from "../../dbConfig/queries/User.query";
+import { getCartByUserId } from "../../dbConfig/queries/User/Cart.query";
 interface CartItem {
   menuItemId: string;
   quantity: number;
@@ -128,22 +133,21 @@ class HomeService {
         deliveryFee: distance < 3 ? 0 : distance * 0.5,
         travelTime,
         openTime: isSpecialEventDate(moment())
-        ? store.specialEventOpenTime
-        : store.openTime !== null
-        ? store.openTime
-        : defaultOpenTime,
-      closeTime: isSpecialEventDate(moment())
-        ? store.specialEventCloseTime
-        : store.closeTime !== null
-        ? store.closeTime
-        : defaultCloseTime,
+          ? store.specialEventOpenTime
+          : store.openTime !== null
+          ? store.openTime
+          : defaultOpenTime,
+        closeTime: isSpecialEventDate(moment())
+          ? store.specialEventCloseTime
+          : store.closeTime !== null
+          ? store.closeTime
+          : defaultCloseTime,
       };
     } catch (error: any) {
       throw new InternalServerError(error.message);
     }
   }
   async getStoreMenuItems(storeId: string, userId: string) {
-
     const cart = await getCartByUserId(userId);
     const { menuItems } = await getStoreMenuItems(storeId);
     const cartItemsMap: { [key: string]: number } =

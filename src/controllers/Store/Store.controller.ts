@@ -1,7 +1,7 @@
 import { MESSAGES, STATUS_CODE } from "../../utils/Constant";
 import StoreService from "../../services/Store/Store.service";
 import { Request, Response, NextFunction } from "express";
-import { getStoreById, getStoreByUserId } from "../../dbConfig/queries/Store.query";
+import { getStoreById } from "../../dbConfig/queries/Store/Store.query";
 import { z } from "zod";
 import { StoreProfileSchema } from "../../Schemas/StoreProfile.schema";
 import { getImage } from "../../utils/UploadToS3";

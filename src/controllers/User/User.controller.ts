@@ -10,7 +10,7 @@ import { InternalServerError, NotFoundError } from "../../utils/Error";
 import {
   getUserRefreshToken,
   updateUser,
-} from "../../dbConfig/queries/User.query";
+} from "../../dbConfig/queries/User/User.query";
 import { clearCookie } from "../../utils/HandleCookies";
 
 class UserController {

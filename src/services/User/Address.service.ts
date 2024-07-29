@@ -1,10 +1,10 @@
 import { NotFoundError } from "../../utils/Error";
+import { getUserById } from "../../dbConfig/queries/User/User.query";
 import {
   createAddress,
-  getUserById,
   markAddressAsDefault,
   updateAddress,
-} from "../../dbConfig/queries/User.query";
+} from "../../dbConfig/queries/User/Address.query";
 import { MESSAGES } from "../../utils/Constant";
 import { Address } from "@prisma/client";
 

@@ -1,6 +1,5 @@
-import { Address } from "@prisma/client";
-import prisma from "..";
-import { InternalServerError } from "../../utils/Error";
+import prisma from "../..";
+import { InternalServerError } from "../../../utils/Error";
 
 const createUser = async (name: string, email: string, password: string) => {
   try {
@@ -202,87 +201,6 @@ const updateUser = async (id: string, data: any) => {
   }
 };
 
-const getUserAddressById = async (id: string) => {
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id,
-      },
-      select: {
-        defaultAddressId: true,
-        addresses: true,
-      },
-    });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const addressesWithDefaultFlag = user.addresses.map((address) => ({
-      ...address,
-      isDefault: address.id === user.defaultAddressId,
-    }));
-
-    return addressesWithDefaultFlag;
-  } catch (error: any) {
-    throw new InternalServerError(error.message);
-  }
-};
-
-const createAddress = async (id: string, data: Address) => {
-  try {
-    const newAddress = await prisma.address.create({
-      data: {
-        ...data,
-        userId: id,
-      },
-    });
-    return newAddress;
-  } catch (error: any) {
-    throw new InternalServerError(error.message);
-  }
-};
-
-const updateAddress = async (addressId: string, data: any) => {
-  try {
-    return await prisma.address.update({
-      where: {
-        id: addressId,
-      },
-      data,
-    });
-  } catch (error: any) {
-    throw new InternalServerError(error.message);
-  }
-};
-
-const deleteAddress = async (id: string) => {
-  try {
-    return await prisma.address.delete({
-      where: {
-        id,
-      },
-    });
-  } catch (error: any) {
-    throw new InternalServerError(error.message);
-  }
-};
-
-const markAddressAsDefault = async (userId: string, addressId: string) => {
-  try {
-    return await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        defaultAddressId: addressId,
-      },
-    });
-  } catch (error: any) {
-    throw new InternalServerError(error.message);
-  }
-};
-
 const getUserPhoneOtp = async (id: string) => {
   try {
     return await prisma.user.findUnique({
@@ -328,49 +246,6 @@ const getUserByGoogleId = async (id: string) => {
   }
 };
 
-const getCartByUserId = async (userId: string) => {
-  try {
-    const cart = await prisma.cart.findUnique({
-      where: { userId },
-      select: {
-        items: {
-          select: {
-            menuItemId: true,
-            quantity: true,
-          },
-        },
-      },
-    });
-    return cart;
-  } catch (error: any) {
-    throw new InternalServerError(error.message);
-  }
-};
-const getTwoFactorSecret = async (userId: string) => {
-  try {
-    return await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        twoFactorAuthSecret: true,
-      },
-    });
-  } catch (error: any) {
-    throw new InternalServerError(error.message);
-  }
-};
-const getTwoFactorStatus = (userId: any) => {
-  return prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      twoFactorAuthEnabled: true,
-      twoFactorVerifiedAt: true,
-    }
-  })
-}
 export {
   createUser,
   getUserByEmail,
@@ -378,18 +253,10 @@ export {
   updateUser,
   getUserForgotPassword,
   getUserRefreshToken,
-  getUserAddressById,
-  createAddress,
-  updateAddress,
-  deleteAddress,
-  markAddressAsDefault,
   getUserPhoneOtp,
   getUserEmailOtp,
   getUserByPhoneNumber,
   getUserByGoogleId,
   createUserWithSocialSingUp,
-  getCartByUserId,
-  getUserStripeCustomerId,
-  getTwoFactorSecret,
-  getTwoFactorStatus,
+  getUserStripeCustomerId
 };
