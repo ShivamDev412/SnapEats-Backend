@@ -631,6 +631,7 @@ class ProfileController {
   };
   getStoreTiming = async (req: Request, res: Response, next: NextFunction) => {
     const storeId = req.user?.storeId;
+    console.log(storeId);
     try {
       const storeTiming = await getStoreTime(storeId as string);
       res.status(STATUS_CODE.OK).json({

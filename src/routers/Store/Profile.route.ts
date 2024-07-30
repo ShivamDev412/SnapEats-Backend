@@ -35,7 +35,7 @@ routes.post(
   AuthMiddleware,
   userProfileController.resendEmailOTP
 );
-routes.get(ENDPOINTS.FOOD_TYPE, userProfileController.getFoodTypes);
+routes.get(ENDPOINTS.FOOD_TYPE, AuthMiddleware, userProfileController.getFoodTypes);
 routes.post(
   ENDPOINTS.FOOD_TYPE,
   AuthMiddleware,
@@ -51,7 +51,7 @@ routes.get(
   AuthMiddleware,
   userProfileController.getStoreFoodTypes
 );
-routes.get(ENDPOINTS.STORE_TIMING, userProfileController.getStoreTiming);
+routes.get(ENDPOINTS.STORE_TIMING, AuthMiddleware, userProfileController.getStoreTiming);
 routes.put(
   ENDPOINTS.STORE_TIMING,
   AuthMiddleware,

@@ -16,6 +16,7 @@ class OrderController {
         success: true,
       });
     } catch (error) {
+      console.log(error);
       next(error);
     }
   };
