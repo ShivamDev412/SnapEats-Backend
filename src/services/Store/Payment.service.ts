@@ -15,39 +15,34 @@ class PaymentService {
     ip: string | undefined,
     storeId: string
   ) {
-    try {
-      const routingNumber = `${institutionNumber}${transitNumber}`;
-
-      const account = await stripe.accounts.create({
-        type: "custom",
+    const routingNumber = `${institutionNumber}${transitNumber}`;
+    const account = await stripe.accounts.create({
+      type: "custom",
+      country: COUNTRY_CODE.CA,
+      email: email,
+      business_type: "individual",
+      individual: {
+        first_name: accountHolderName.split(" ")[0],
+        last_name: accountHolderName.split(" ")[1],
+      },
+      capabilities: {
+        card_payments: { requested: true },
+        transfers: { requested: true },
+      },
+      external_account: {
+        object: "bank_account",
         country: COUNTRY_CODE.CA,
-        email: email,
-        business_type: "individual",
-        individual: {
-          first_name: accountHolderName.split(" ")[0],
-          last_name: accountHolderName.split(" ")[1],
-        },
-        capabilities: {
-          card_payments: { requested: true },
-          transfers: { requested: true },
-        },
-        external_account: {
-          object: "bank_account",
-          country: COUNTRY_CODE.CA,
-          currency: CURRENCY.CAD,
-          account_number: accountNumber,
-          routing_number: routingNumber,
-        },
-      });
+        currency: CURRENCY.CAD,
+        account_number: accountNumber,
+        routing_number: routingNumber,
+      },
+    });
 
-      if (account.id) {
-        await updateStoreById(storeId, { stripeAccountId: account.id });
-        return account;
-      } else {
-        return null;
-      }
-    } catch (error: any) {
-      throw new InternalServerError(error.message);
+    if (account.id) {
+      await updateStoreById(storeId, { stripeAccountId: account.id });
+      return account;
+    } else {
+      throw new InternalServerError(MESSAGES.ACCOUNT_CREATION_FAILED);
     }
   }
   async getBankAccount(storeId: string) {

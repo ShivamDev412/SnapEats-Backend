@@ -82,6 +82,11 @@ export const MESSAGES = {
   PAYMENT_PROCESSED: "Payment processed successfully",
   ORDER_CANCELLED: "Order cancelled successfully",
   ORDER_FETCHED: "Order fetched successfully",
+  PAYMENT_FAILED: "Payment failed",
+  TRANSFER_FAILED: "Transfer failed",
+  STRIPE_ACCOUNT_CAPABILITIES_NOT_MET: "Store's Stripe account does not have the necessary capabilities",
+  STRIPE_ACCOUNT_NOT_FOUND: "Stripe account not found",
+  ACCOUNT_CREATION_FAILED: "Account creation failed",
 };
 export const VALIDATION_MESSAGES = {
   INVALID_EMAIL: "Invalid email address",
