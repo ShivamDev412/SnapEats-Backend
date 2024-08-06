@@ -1,4 +1,7 @@
-import { clearCart, getCartWithStore } from "../../dbConfig/queries/User/Cart.query";
+import {
+  clearCart,
+  getCartWithStore,
+} from "../../dbConfig/queries/User/Cart.query";
 import { getUserStripeCustomerId } from "../../dbConfig/queries/User/User.query";
 import { InternalServerError } from "../../utils/Error";
 import { MESSAGES, SOCKET_EVENT, TAX } from "../../utils/Constant";
@@ -96,7 +99,7 @@ class CheckoutService {
       orderSummary.reduce((total, store) => {
         return total + store.totalWithTax;
       }, 0) || 0;
-  
+
     return {
       orderSummary,
       grandTotal,
@@ -109,25 +112,25 @@ class CheckoutService {
     if (!user) {
       throw new InternalServerError(MESSAGES.USER_NOT_FOUND);
     }
-    const storeOrderPromises = orderItems.map(async (store) => {
-      const storeId = store.storeId;
-
-      const storeOrder = await createOrder(
-        userId,
-        store.totalWithTax,
-        storeId,
-        store.items
-      );
-      const orderToSend = await getOrderDetailById(storeOrder.id);
-      await clearCart(userId)
-      io.emit(SOCKET_EVENT.NEW_ORDER, orderToSend, () => {
-        console.log("Order emitted");
-      });
-
-      return storeOrder;
-    });
-
-    const orders = await Promise.all(storeOrderPromises);
+    if(!user.defaultAddressId) {
+      throw new InternalServerError(MESSAGES.NO_DEFAULT_ADDRESS);
+    }
+    const orders = await Promise.all(
+      orderItems.map(async (store) => {
+        const storeId = store.storeId;
+        const storeOrder = await createOrder(
+          userId,
+          store.totalWithTax,
+          storeId,
+          user?.defaultAddressId as string,
+          store.items
+        );
+        const orderToSend = await getOrderDetailById(storeOrder.id);
+        await clearCart(userId);
+        io.emit(SOCKET_EVENT.NEW_ORDER, orderToSend);
+        return storeOrder;
+      })
+    );
 
     return orders;
   }

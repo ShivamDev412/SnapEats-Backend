@@ -8,11 +8,17 @@ const transporter = nodemailer.createTransport({
     pass: process.env.NODEMAILER_PASSWORD,
   },
 });
-export const sendToMail = async (email: string, subject: string, html: any) => {
+export const sendToMail = async (
+  email: string,
+  subject: string,
+  html: any,
+  storeName?: string,
+  storeEmail?: string
+) => {
   const info = await transporter.sendMail({
     from: {
-      name: "Snap Eats Team",
-      address: process.env.NODEMAILER_EMAIL!,
+      name: storeName || "Snap Eats Team",
+      address: storeEmail || process.env.NODEMAILER_EMAIL!,
     },
     to: email,
     subject: subject,

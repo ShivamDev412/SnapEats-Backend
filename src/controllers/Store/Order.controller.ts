@@ -11,7 +11,7 @@ class OrderController {
       const { orderId } = req.body;
       const paymentIntent = await this.orderService.acceptOrder(orderId);
       res.status(STATUS_CODE.OK).json({
-        message: MESSAGES.PAYMENT_PROCESSED,
+        message: MESSAGES.ORDER_ACCEPTED,
         data: paymentIntent,
         success: true,
       });
@@ -37,7 +37,10 @@ class OrderController {
     const { page } = req.query as { page: string };
     try {
       const storeId = req.params.storeId;
-      const {orders, totalCount} = await this.orderService.getOrder(storeId, +page);
+      const { orders, totalCount } = await this.orderService.getOrder(
+        storeId,
+        +page
+      );
       res.status(200).json({
         success: true,
         data: {

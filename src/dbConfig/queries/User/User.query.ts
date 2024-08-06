@@ -133,6 +133,7 @@ const getUserStripeCustomerId = async (id: string) => {
         stripeCustomerId: true,
         email: true,
         paymentMethodId: true,
+        defaultAddressId: true,
       },
     });
   } catch (error: any) {
@@ -258,5 +259,5 @@ export {
   getUserByPhoneNumber,
   getUserByGoogleId,
   createUserWithSocialSingUp,
-  getUserStripeCustomerId
+  getUserStripeCustomerId,
 };

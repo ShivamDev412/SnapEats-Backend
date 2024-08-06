@@ -5,4 +5,9 @@ import { Router } from "express";
 const routes = Router();
 const orderController = new OrderController();
 routes.get(ENDPOINTS.ORDER, AuthMiddleware, orderController.getOrders);
+routes.get(
+  ENDPOINTS.ORDER_STATUS,
+  AuthMiddleware,
+  orderController.getOrdersLiveStatus
+);
 export default routes;

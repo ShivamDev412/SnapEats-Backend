@@ -33,6 +33,7 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(morgan("dev"), express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const allowedOrigins = [

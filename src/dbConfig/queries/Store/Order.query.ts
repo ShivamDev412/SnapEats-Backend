@@ -1,27 +1,43 @@
 import { MESSAGES } from "../../../utils/Constant";
 import prisma from "../../../dbConfig";
 import { InternalServerError } from "../../../utils/Error";
+import { OrderStatus } from "@prisma/client";
+const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
+  const data =
+    status === OrderStatus.ACCEPTED
+      ? { acceptedAt: new Date(), status }
+      : { status };
+  return await prisma.order.update({
+    where: {
+      id: orderId,
+    },
+    data,
+    select: {
+      acceptedAt: true,
+      deliveryAddress: true,
+      store: {
+        include: {
+          address: {
+            select: {
+              lat: true,
+              lon: true,
+            },
+          },
+        },
+      },
+      items: {
+        include: {
+          menuItem: {
+            select: {
+              prepTime: true,
+            },
+          },
+        },
+      },
+    },
+  });
+};
 
-const acceptOrder = async (orderId: string) => {
-  return await prisma.order.update({
-    where: {
-      id: orderId,
-    },
-    data: {
-      status: "ACCEPTED",
-    },
-  });
-};
-const cancelOrder = async (orderId: string) => {
-  return await prisma.order.update({
-    where: {
-      id: orderId,
-    },
-    data: {
-      status: "CANCELED",
-    },
-  });
-};
 const getOrdersByStoreId = async (storeId: string, page: number) => {
   try {
     const orders = await prisma.order.findMany({
@@ -75,4 +91,22 @@ const getOrdersByStoreId = async (storeId: string, page: number) => {
     throw new InternalServerError(MESSAGES.UNEXPECTED_ERROR);
   }
 };
-export { acceptOrder, cancelOrder, getOrdersByStoreId };
+
+const updateOrderApplicationFeeAndTime = async (
+  orderId: string,
+  applicationFee: number,
+  minTime:string,
+  maxTime:string
+) => {
+  return await prisma.order.update({
+    where: {
+      id: orderId,
+    },
+    data: {
+      applicationFee,
+      minTime,
+      maxTime,
+    },
+  });
+};
+export { updateOrderStatus, getOrdersByStoreId, updateOrderApplicationFeeAndTime };
