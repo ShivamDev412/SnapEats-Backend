@@ -122,7 +122,7 @@ const StoreVerificationSuccessTemplate = (name: string, storeName: string) => {
 };
 const StoreRegistrationRejectionTemplate = (
   name: string,
-  storeName: string,
+  storeName: string
 ) => {
   return `
     <div style="background-color: #f4f4f4; padding: 20px 0; font-family: Arial, sans-serif;">
@@ -151,10 +151,32 @@ const StoreRegistrationRejectionTemplate = (
     </div>
   `;
 };
+const CancelOrderNotificationTemplate = (name: string, orderId: string) => {
+  return `
+    <div style="background-color: #f4f4f4; padding: 20px 0; font-family: Arial, sans-serif;">
+      <div style="background-color: #fff; padding: 20px; max-width: 600px; margin: 0 auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="https://snapeats-assets.s3.us-west-2.amazonaws.com/snap_Eats_logo.png" alt="SnapEats" style="width: 150px;">
+        </div>
+        <h1 style="font-size: 24px; color: #333; margin-bottom: 20px;">Hello ${name},</h1>
+        <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+          We regret to inform you that your order with ID ${orderId} has been cancelled.
+        </p>
+        <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+          If you have any questions or concerns, please feel free to contact our support team at <a href="mailto:support@snapeats.com">support@snapeats.com</a>.
+        </p>
+        <p style="font-size: 14px; color: #666; margin-top: 20px;">
+          Thank you,<br>SnapEats Team
+        </p>
+      </div>
+    </div>
+  `;
+};
 export {
   ForgotPasswordTemplate,
   EmailVerificationTemplate,
   StoreAccountRequestTemplate,
   StoreVerificationSuccessTemplate,
   StoreRegistrationRejectionTemplate,
+  CancelOrderNotificationTemplate
 };

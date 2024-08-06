@@ -26,5 +26,20 @@ class OrderController {
       next(error);
     }
   };
+  getOrdersLiveStatus = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const userId = req.user?.id as string;
+      await this.orderService.getOrdersLiveStatus(userId);
+      res.status(200).json({
+        success: true,
+      });
+    } catch (error: any) {
+      next(error);
+    }
+  };
 }
 export default OrderController;

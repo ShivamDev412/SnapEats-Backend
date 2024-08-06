@@ -6,11 +6,13 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 generator erd {
-  provider = "prisma-erd-generator"
-  output = "./ERD.svg"
+  provider                  = "prisma-erd-generator"
+  output                    = "./ERD.svg"
   includeRelationFromFields = true
 }
+
 model User {
   id                       String    @id @default(cuid())
   name                     String
@@ -63,6 +65,8 @@ model Address {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
   UserDefaultAddress User?    @relation("UserDefaultAddress")
+
+  Order Order[]
 }
 
 model Store {
@@ -212,15 +216,21 @@ model Review {
 }
 
 model Order {
-  id          String      @id @default(cuid())
-  user        User        @relation(fields: [userId], references: [id])
-  userId      String
-  store       Store       @relation(fields: [storeId], references: [id])
-  storeId     String
-  items       OrderItem[] // One to Many relation
-  totalAmount Float
-  status      OrderStatus @default(PENDING)
-  createdAt   DateTime    @default(now())
+  id                String      @id @default(cuid())
+  user              User        @relation(fields: [userId], references: [id])
+  userId            String
+  store             Store       @relation(fields: [storeId], references: [id])
+  storeId           String
+  items             OrderItem[] // One to Many relation
+  totalAmount       Float
+  applicationFee    Float?
+  deliveryAddressId String?
+  deliveryAddress   Address?    @relation(fields: [deliveryAddressId], references: [id])
+  status            OrderStatus @default(PENDING)
+  acceptedAt        DateTime?
+  minTime           String?
+  maxTime           String?
+  createdAt         DateTime    @default(now())
 }
 
 enum OrderStatus {

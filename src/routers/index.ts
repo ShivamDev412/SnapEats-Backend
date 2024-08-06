@@ -13,7 +13,6 @@ import checkoutRoute from "./User/Checkout.route";
 import storeMenuRoute from "./Store/Menu.route";
 import homeRoute from "./User/Home.route";
 import storeProfileRoute from "./Store/Profile.route";
-import storePaymentRoute from "./Store/Payment.route";
 import twoFaRoute from "./User/TwoFactor.route";
 import paymentRoutes from "../routers/User/Payments.route";
 import storeOrderRoutes from "../routers/Store/Order.route";
@@ -39,7 +38,6 @@ routes.use(
   storeRoute,
   storeProfileRoute,
   storeMenuRoute,
-  storePaymentRoute,
   storeOrderRoutes
 );
 routes.use(RESOURCE_PATH.ADMIN_AUTH, adminAutRoute);

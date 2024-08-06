@@ -7,6 +7,7 @@ const createOrder = async (
   userId: string,
   amount: number,
   storeId: string,
+  defaultAddressId: string,
   orderItems: OrderSummaryItem[]
 ) => {
   try {
@@ -30,8 +31,11 @@ const createOrder = async (
             },
           })),
         },
+        acceptedAt: new Date(),
+        deliveryAddressId: defaultAddressId,
         status: "PENDING",
       },
+      
     });
     return newOrder;
   } catch (error) {
@@ -129,20 +133,60 @@ const getOrderById = async (orderId: string) => {
       store: {
         select: {
           name: true,
+          email: true,
           id: true,
           deliveryFee: true,
-          stripeAccountId: true,
         },
       },
       user: {
         select: {
           name: true,
+          email: true,
           id: true,
-          addresses: true,
-          paymentMethodId: true,
-          stripeCustomerId: true,
         },
       },
+    },
+  });
+};
+const getOrdersStatus = async (userId: string) => {
+  return await prisma.order.findMany({
+    where: {
+      userId,
+      OR: [
+        { status: "ACCEPTED" },
+        { status: "PREPARING" },
+        { status: "READY" },
+        { status: "OUT_FOR_DELIVERY" },
+      ],
+    },
+    select: {
+      maxTime: true,
+      minTime: true,
+      id: true,
+      status: true,
+      deliveryAddress: {
+        select: {
+          lat: true,
+          lon: true,
+        },
+      },
+      items: {
+        include: {
+          menuItem: {
+            select: {
+              prepTime: true,
+            },
+          },
+        },
+      },
+      acceptedAt: true,
+      store: {
+        select: {
+          name: true,
+          id: true,
+        },
+      },
+      createdAt: true,
     },
   });
 };
@@ -152,4 +196,5 @@ export {
   getOrderById,
   getOrderDetailById,
   getOrders,
+  getOrdersStatus,
 };

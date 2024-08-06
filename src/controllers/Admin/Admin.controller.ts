@@ -11,6 +11,10 @@ import {
   updateAdmin,
 } from "../../dbConfig/queries/Admin.query";
 import { clearCookie } from "../../utils/HandleCookies";
+import {
+  getStoresForAdmin,
+  getUsersForAdmin,
+} from "../../dbConfig/queries/Admin";
 class AdminController {
   private adminService: AdminService;
   constructor() {
@@ -66,7 +70,7 @@ class AdminController {
     next: NextFunction
   ) => {
     try {
-      const { storeId } = req.body
+      const { storeId } = req.body;
       const store = await this.adminService.acceptStoreRequest(storeId);
       res.status(STATUS_CODE.OK).json({
         success: true,
@@ -98,5 +102,38 @@ class AdminController {
       next(error);
     }
   };
+  getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { page } = req.query as { page: string };
+      const { users, totalCount } = await getUsersForAdmin(+page, 10);
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: {
+          users,
+          totalCount,
+          page: +page,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+  getAllStores = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { page } = req.query as { page: string };
+      const { stores, totalCount } = await getStoresForAdmin(+page, 10);
+      res.status(STATUS_CODE.OK).json({
+        success: true,
+        data: {
+          stores,
+          totalCount,
+          page: +page,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
+
 export default AdminController;

@@ -2,14 +2,19 @@ import Stripe from "stripe";
 import { InternalServerError } from "../../utils/Error";
 import { getOrderById } from "../../dbConfig/queries/User/Order.query";
 import {
-  acceptOrder,
-  cancelOrder,
+  updateOrderStatus,
   getOrdersByStoreId,
+  updateOrderApplicationFeeAndTime,
 } from "../../dbConfig/queries/Store/Order.query";
-import { CURRENCY, MESSAGES, SOCKET_EVENT } from "../../utils/Constant";
+import { MESSAGES, ORDER_STATUS, SOCKET_EVENT } from "../../utils/Constant";
 import { io } from "../../index";
 import { getImage } from "../../utils/UploadToS3";
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!,);
+import { CancelOrderNotificationTemplate } from "../../utils/EmailTemplates";
+import { sendToMail } from "../../utils/NodeMailer";
+import { getStoreAddressCoordinates } from "../../dbConfig/queries/Store/Store.query";
+import moment from "moment";
+import handleOrderStatusDetails from "../../utils/HandleOrderStatusDetails";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 class OrderService {
   async getOrder(storeId: string, page: number) {
@@ -49,80 +54,48 @@ class OrderService {
     if (!order) {
       throw new InternalServerError(MESSAGES.ORDER_NOT_FOUND);
     }
-
-    const user = order.user;
-    const store = order.store;
-    // Check if user has a default payment method
-    if (!user.paymentMethodId) {
-      throw new InternalServerError(MESSAGES.PAYMENT_METHOD_NOT_SET);
-    }
-    if (!store) {
-      throw new InternalServerError(MESSAGES.STORE_NOT_FOUND);
-    }
-
-    // Ensure the store's Stripe account has the necessary capabilities
-    const storeAccount =
-      store?.stripeAccountId &&
-      (await stripe.accounts.retrieve(store?.stripeAccountId));
-    if (!storeAccount) {
-      throw new InternalServerError(MESSAGES.STRIPE_ACCOUNT_NOT_FOUND);
-    }
-    console.log(storeAccount.capabilities, "storeAccount.capabilities");
-    if (
-      !storeAccount.capabilities?.transfers ||
-      storeAccount.capabilities.transfers !== "active"
-    ) {
-      throw new InternalServerError(
-        MESSAGES.STRIPE_ACCOUNT_CAPABILITIES_NOT_MET
-      );
-    }
-
-    const amount = order.totalAmount;
-
-    // Calculate platform fee (15%) and total store amounts
-    const platformFee = Math.floor(amount * 0.15);
-    const storeAmount = amount - platformFee;
-
-    // Create the PaymentIntent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // amount in cents
-      currency: CURRENCY.CAD,
-      automatic_payment_methods: { enabled: true, allow_redirects: "never" },
-      customer: user.stripeCustomerId as string,
-      payment_method: user.paymentMethodId as string,
-      confirm: true,
-      metadata: {
-        userId: user.id,
-        orderId: order.id,
+    const applicationFee = order.totalAmount * 0.05;
+    const updatedOrder = await updateOrderStatus(order.id, ORDER_STATUS[0]);
+    const { deliveryAddress, store, acceptedAt, items } = updatedOrder;
+    const { minTime, maxTime } = handleOrderStatusDetails(
+      deliveryAddress?.lat as number,
+      deliveryAddress?.lon as number,
+      store.address?.lat as number,
+      store.address?.lon as number,
+      items as { menuItem: { prepTime: number } }[],
+      moment(acceptedAt)
+    );
+    await updateOrderApplicationFeeAndTime(
+      order.id,
+      applicationFee,
+      minTime,
+      maxTime
+    );
+    io.emit(SOCKET_EVENT.ORDER_STATUS, {
+      orderId: order.id,
+      storeName: order.store.name,
+      estimatedDeliveryTime: {
+        minTime: minTime,
+        maxTime: maxTime,
       },
+      status: ORDER_STATUS[0],
     });
-
-    if (!paymentIntent) {
-      throw new InternalServerError(MESSAGES.PAYMENT_FAILED);
-    }
-
-    const chargeId = paymentIntent.latest_charge as string;
-
-    // Create Transfer for the store
-    const transfer = await stripe.transfers.create({
-      amount: Math.round(storeAmount * 100),
-      currency: CURRENCY.CAD,
-      destination: store.stripeAccountId as string,
-      source_transaction: chargeId,
-      metadata: {
-        orderId: order.id,
-      },
-    });
-
-    if (!transfer) {
-      throw new InternalServerError(MESSAGES.TRANSFER_FAILED);
-    }
-
-    await acceptOrder(order.id);
-    io.to(order.storeId).emit(SOCKET_EVENT.ORDER_STATUS, {
-      ...order,
-      status: "ACCEPTED",
-    });
+    setTimeout(async () => {
+      try {
+        await updateOrderStatus(order.id, ORDER_STATUS[1]);
+        io.emit(SOCKET_EVENT.ORDER_STATUS, {
+          orderId: order.id,
+          storeName: order.store.name,
+          estimatedDeliveryTime: {
+            minTime: minTime,
+            maxTime: maxTime,
+          },
+          status: ORDER_STATUS[1],
+        });
+      } catch (error) {
+        throw new InternalServerError(MESSAGES.UNEXPECTED_ERROR);
+      }
+    }, 20000);
     return order;
   }
 
@@ -133,10 +106,21 @@ class OrderService {
       throw new InternalServerError(MESSAGES.ORDER_NOT_FOUND);
     }
 
-    await cancelOrder(order.id);
+    await updateOrderStatus(order.id, ORDER_STATUS[2]);
+    const htmlTemplate = CancelOrderNotificationTemplate(
+      order.user.name,
+      order.id
+    );
+    await sendToMail(
+      order.user.email,
+      MESSAGES.CANCELLED_ORDER_SUBJECT,
+      htmlTemplate,
+      order.store.name,
+      order.store.email
+    );
     io.to(order.storeId).emit(SOCKET_EVENT.ORDER_STATUS, {
-      ...order,
-      status: "CANCELLED",
+      orderId: order.id,
+      status: ORDER_STATUS[2],
     });
 
     return order;

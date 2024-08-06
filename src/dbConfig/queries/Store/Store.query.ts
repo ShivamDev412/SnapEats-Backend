@@ -369,7 +369,12 @@ const getStoreTime = async (storeId: string) => {
     throw new InternalServerError(error.message);
   }
 };
-
+const getStoreAddressCoordinates = (storeId: string) => {
+  return prisma.storeAddress.findFirst({
+    where: { storeId },
+    select: { lat: true, lon: true },
+  });
+};
 export {
   createStore,
   getStoreByEmail,
@@ -385,4 +390,5 @@ export {
   getStoreTime,
   getStoreHomeById,
   getStorePrimaryDetails,
+  getStoreAddressCoordinates
 };

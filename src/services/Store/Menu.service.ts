@@ -93,7 +93,8 @@ class MenuService {
     const compressedImage = await uploadCompressedImageToS3(
       name,
       file?.buffer,
-      file?.mimetype
+      file?.mimetype,
+      true
     );
     if (!image || !compressedImage) {
       throw new InternalServerError(MESSAGES.IMAGE_ERROR);
@@ -206,7 +207,8 @@ class MenuService {
       compressedImageToSend = await uploadCompressedImageToS3(
         name,
         file?.buffer,
-        file?.mimetype
+        file?.mimetype,
+        true,
       );
     } else {
       imageToSend = menuItem?.image;

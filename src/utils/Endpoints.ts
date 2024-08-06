@@ -46,6 +46,7 @@ const ENDPOINTS = {
   CART: "/cart",
   CHECKOUT: "/checkout",
   ORDER: "/order",
+  ORDER_STATUS: "/order-status",
   PAYMENTS: "/payments",
   BANK_ACCOUNT: "/bank-account",
   VERIFY_2FA: "/verify-2fa",
@@ -61,6 +62,8 @@ const ENDPOINTS = {
   ACCEPT_STORE_REQUEST: "/accept-store-request",
   REJECT_STORE_REQUEST: "/reject-store-request",
   HOME: "/home",
+  USERS: "/users",
+  STORES: "/stores",
 };
 
 export { ENDPOINTS, BASE_PATH, RESOURCE_PATH };

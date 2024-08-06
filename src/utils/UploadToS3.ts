@@ -71,16 +71,21 @@ export const getImage = async (name: string) => {
 export const uploadCompressedImageToS3 = async (
   name: string,
   image: any,
-  contentType: any
+  contentType: any,
+  aspectRatio: boolean = false
 ) => {
-  const targetFileSize = 1024; 
+  const targetFileSize = 1024;
 
   let compressedImageBuffer = await sharp(image)
-    .resize({
-      width: 89,
-      height: 51,
-      fit: "fill",
-    })
+    .resize(
+      aspectRatio
+        ? { width: 89, height: 89, fit: "contain" }
+        : {
+            width: 89,
+            height: 51,
+            fit: "contain",
+          }
+    )
     .toFormat("webp")
     .toBuffer({ resolveWithObject: true });
 
