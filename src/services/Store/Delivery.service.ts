@@ -1,4 +1,4 @@
-import { io } from "@/index";
+import { io } from "../../index";
 import { updateOrderStatus } from "../../dbConfig/queries/Store/Order.query";
 import { ORDER_STATUS, SOCKET_EVENT } from "../../utils/Constant";
 import { getOrderById } from "../../dbConfig/queries/User/Order.query";
@@ -12,10 +12,10 @@ class DeliveryService {
     io.emit(SOCKET_EVENT.ORDER_STATUS, {
       orderId: order?.id,
       storeName: order?.store.name,
-      estimatedDeliveryTime: {
-        minTime: order?.minTime,
-        maxTime: order?.maxTime,
-      },
+      // estimatedDeliveryTime: {
+      //   minTime: order?.minTime,
+      //   maxTime: order?.maxTime,
+      // },
       status: ORDER_STATUS[4],
     });
     const distance = calculateDistance(
@@ -32,19 +32,19 @@ class DeliveryService {
       distance
     );
     const avgTime = (minTravelTime + maxTravelTime) / 2;
-
+    const deliveryTime = avgTime * 1000;
     setTimeout(async () => {
       await updateOrderStatus(orderId, ORDER_STATUS[5]);
       io.emit(SOCKET_EVENT.ORDER_STATUS, {
         orderId: order?.id,
         storeName: order?.store.name,
-        estimatedDeliveryTime: {
-          minTime: order?.minTime,
-          maxTime: order?.maxTime,
-        },
+        // estimatedDeliveryTime: {
+        //   minTime: order?.minTime,
+        //   maxTime: order?.maxTime,
+        // },
         status: ORDER_STATUS[5],
       });
-    }, avgTime * 60000); // converting minutes to milliseconds
+    }, 15000);
   }
 }
 export default DeliveryService;

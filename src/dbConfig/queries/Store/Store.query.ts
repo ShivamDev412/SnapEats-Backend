@@ -341,6 +341,7 @@ const getAllStores = async () => {
         },
         foodTypes: {
           select: {
+            id: true,
             foodType: true,
           },
         },

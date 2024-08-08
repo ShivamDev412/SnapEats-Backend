@@ -45,10 +45,10 @@ class OrderService {
       io.emit(SOCKET_EVENT.ORDER_STATUS, {
         orderId: order.id,
         storeName: order.store.name,
-        estimatedDeliveryTime: {
-          minTime: order.minTime,
-          maxTime: order.maxTime,
-        },
+        // estimatedDeliveryTime: {
+        //   minTime: order.minTime,
+        //   maxTime: order.maxTime,
+        // },
         status: order.status,
       });
     }

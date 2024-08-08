@@ -5,7 +5,7 @@ type GetStoreQuery = {
   lat: number;
   lon: number;
   search: string;
-  foodTypeId: string;
+  foodType: string;
 };
 class HomeController {
   private homeService: HomeService;
@@ -13,14 +13,14 @@ class HomeController {
     this.homeService = new HomeService();
   }
   getStores = async (req: Request, res: Response, next: NextFunction) => {
-    const { lat, lon, search, foodTypeId } =
+    const { lat, lon, search, foodType } =
       req.query as unknown as GetStoreQuery;
     try {
       const stores = await this.homeService.getStores(
         lat,
         lon,
         search,
-        foodTypeId
+        foodType
       );
       return res.status(200).json({
         data: stores,
