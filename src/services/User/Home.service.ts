@@ -24,7 +24,7 @@ class HomeService {
     lat: number,
     lon: number,
     search: String,
-    foodTypeId: string
+    foodType: string
   ) {
     const getAllStore = await getAllStores();
     let filteredStores = getAllStore
@@ -66,9 +66,10 @@ class HomeService {
         store.name.toLowerCase().includes(search.toLowerCase())
       );
     }
-    if (foodTypeId) {
+    if (foodType) {
+      console.log(filteredStores[2].foodTypes);
       filteredStores = filteredStores.filter((store) =>
-        store.foodTypes.map((type) => type.foodType).includes(foodTypeId)
+        store.foodTypes.map((type) => type.foodType).includes(foodType)
       );
     }
     const isSpecialEventDate = (date: moment.Moment): boolean => {

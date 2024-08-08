@@ -17,6 +17,7 @@ import twoFaRoute from "./User/TwoFactor.route";
 import paymentRoutes from "../routers/User/Payments.route";
 import storeOrderRoutes from "../routers/Store/Order.route";
 import orderRoutes from "../routers/User/Order.route";
+import deliveryRotes from "../routers/Store/Delivery.route";
 const routes = express.Router();
 
 routes.use(RESOURCE_PATH.AUTH, authRoute);
@@ -38,7 +39,8 @@ routes.use(
   storeRoute,
   storeProfileRoute,
   storeMenuRoute,
-  storeOrderRoutes
+  storeOrderRoutes,
+  deliveryRotes
 );
 routes.use(RESOURCE_PATH.ADMIN_AUTH, adminAutRoute);
 routes.use(RESOURCE_PATH.ADMIN, adminRoute);

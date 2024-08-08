@@ -74,10 +74,10 @@ class OrderService {
     io.emit(SOCKET_EVENT.ORDER_STATUS, {
       orderId: order.id,
       storeName: order.store.name,
-      estimatedDeliveryTime: {
-        minTime: minTime,
-        maxTime: maxTime,
-      },
+      // estimatedDeliveryTime: {
+      //   minTime: minTime,
+      //   maxTime: maxTime,
+      // },
       status: ORDER_STATUS[0],
     });
     setTimeout(async () => {
@@ -86,10 +86,10 @@ class OrderService {
         io.emit(SOCKET_EVENT.ORDER_STATUS, {
           orderId: order.id,
           storeName: order.store.name,
-          estimatedDeliveryTime: {
-            minTime: minTime,
-            maxTime: maxTime,
-          },
+          // estimatedDeliveryTime: {
+          //   minTime: minTime,
+          //   maxTime: maxTime,
+          // },
           status: ORDER_STATUS[1],
         });
       } catch (error) {
