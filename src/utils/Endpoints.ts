@@ -58,6 +58,9 @@ const ENDPOINTS = {
   CANCEL_ORDER: "/cancel-order",
   STORE_ORDERS: "/store-orders",
   OUT_FOR_DELIVERY: "/out-for-delivery",
+  OVERVIEW_METRICS: "/overview-metrics",
+  ORDER_STATS: "/order-stats",
+  REVENUE_TRENDS: "/revenue-trends",
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",
@@ -65,6 +68,7 @@ const ENDPOINTS = {
   HOME: "/home",
   USERS: "/users",
   STORES: "/stores",
+  
 };
 
 export { ENDPOINTS, BASE_PATH, RESOURCE_PATH };
