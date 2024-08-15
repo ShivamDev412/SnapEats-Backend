@@ -15,17 +15,13 @@ import moment from "moment";
 import { InternalServerError, NotFoundError } from "../../utils/Error";
 import getTravelTime from "../../utils/TravelTime";
 import { getCartByUserId } from "../../dbConfig/queries/User/Cart.query";
+import { mostOrderedItems } from "../../dbConfig/queries/User/Search.query";
 interface CartItem {
   menuItemId: string;
   quantity: number;
 }
 class HomeService {
-  async getStores(
-    lat: number,
-    lon: number,
-    search: String,
-    foodType: string
-  ) {
+  async getStores(lat: number, lon: number, foodType: string) {
     const getAllStore = await getAllStores();
     let filteredStores = getAllStore
       .filter((store) => {
@@ -61,11 +57,6 @@ class HomeService {
           travelTime,
         };
       });
-    if (search) {
-      filteredStores = filteredStores.filter((store) =>
-        store.name.toLowerCase().includes(search.toLowerCase())
-      );
-    }
     if (foodType) {
       console.log(filteredStores[2].foodTypes);
       filteredStores = filteredStores.filter((store) =>
@@ -174,6 +165,32 @@ class HomeService {
       })
     );
     return menuItemsData;
+  }
+  async searchStoresOrMenuItems(searchTerm: string) {
+    const stores = await getAllStores();
+    const filteredStores = stores.filter(
+      (store) =>
+        store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        store.menuItems.some((item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+    return filteredStores;
+  }
+  async getMostOrdered() {
+    const stores = await mostOrderedItems();
+    const dataWithImage = await Promise.all(
+      stores.map(async (store) => {
+        const image = await getImage(store.image);
+        const compressedImage = await getImage(store.compressedImage);
+        return {
+          ...store,
+          image,
+          compressedImage,
+        };
+      })
+    );
+    return dataWithImage;
   }
 }
 export default HomeService;

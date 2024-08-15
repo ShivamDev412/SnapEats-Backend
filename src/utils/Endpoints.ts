@@ -61,6 +61,7 @@ const ENDPOINTS = {
   OVERVIEW_METRICS: "/overview-metrics",
   ORDER_STATS: "/order-stats",
   REVENUE_TRENDS: "/revenue-trends",
+  MOST_ORDERED: "/most-ordered",
   // Admin
   GET_STORE_REQUESTS: "/store-registration-request",
   ACCEPT_STORE_REQUEST: "/accept-store-request",

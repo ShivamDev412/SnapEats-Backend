@@ -22,4 +22,5 @@ routes.get(
   homeController.getStoreMenuItems
 );
 routes.get("/", homeController.getStores);
+routes.get(ENDPOINTS.MOST_ORDERED, homeController.getMostOrdered);
 export default routes;

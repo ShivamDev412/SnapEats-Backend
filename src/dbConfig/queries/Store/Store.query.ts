@@ -317,7 +317,7 @@ const getAllStores = async () => {
         specialEventCloseTime: true,
         specialEventOpenTime: true,
         menuItems: {
-          select: { prepTime: true },
+          select: { prepTime: true, name:true },
         },
         reviews: {
           select: {
